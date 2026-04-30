@@ -6,7 +6,6 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const dynamic = "force-dynamic";
 
 // GET current profile
 export async function GET() {
