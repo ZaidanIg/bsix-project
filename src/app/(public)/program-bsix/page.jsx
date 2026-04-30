@@ -1,6 +1,8 @@
 import { Leaf, Award, Shield, BookOpen, Target, Users } from "lucide-react";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // Map icon string dari database ke Lucide component
 const getIcon = (iconName, className) => {
   switch (iconName) {

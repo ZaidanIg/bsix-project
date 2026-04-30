@@ -5,6 +5,8 @@ import { ArrowRight, GraduationCap, Users, Sprout, Calendar, Leaf, Trophy } from
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function BerandaPublic() {
   const [totalSiswa, totalGuru, pilarTeratas, beritaTerbaru] = await Promise.all([
     prisma.user.count({ where: { role: "SISWA", isActive: true } }),
