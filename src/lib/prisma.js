@@ -16,26 +16,40 @@ const prismaClientSingleton = () => {
   }
 
   try {
+    const dbUrl = new URL(connectionString);
+    const hasSslRootCert = dbUrl.searchParams.has('sslrootcert');
+    
+    // Always remove sslrootcert from URL to prevent pg from trying to read a local file
+    dbUrl.searchParams.delete('sslrootcert');
+
     let poolConfig = {
-      connectionString: connectionString,
+      connectionString: dbUrl.toString(),
     };
 
-    if (caCert) {
-      // Remove any search params that might conflict with manual SSL config
-      const dbUrl = new URL(connectionString);
-      dbUrl.searchParams.delete('sslrootcert');
+    if (caCert || hasSslRootCert) {
+      // If we have a cert in ENV or the URL originally asked for one
+      let caContent = caCert;
       
-      poolConfig = {
-        connectionString: dbUrl.toString(),
-        ssl: {
-          rejectUnauthorized: false, // Often required for managed databases
-          ca: caCert.trim().replace(/\\n/g, '\n'),
+      // Try to read ca.pem if caCert is not in ENV but was in URL
+      if (!caContent && hasSslRootCert) {
+        try {
+          const fs = require('fs');
+          const path = require('path');
+          const caPath = path.join(process.cwd(), 'ca.pem');
+          if (fs.existsSync(caPath)) {
+            caContent = fs.readFileSync(caPath, 'utf8');
+          }
+        } catch (fsErr) {
+          console.warn("Warning: Could not read ca.pem from filesystem:", fsErr.message);
         }
+      }
+
+      poolConfig.ssl = {
+        rejectUnauthorized: false, // Maintain compatibility with managed DBs
+        ...(caContent ? { ca: caContent.trim().replace(/\\n/g, '\n') } : {})
       };
     } else {
-      // Fallback for connections that might need SSL but don't provide a CA cert
-      // (Common for Neon/Supabase with ?sslmode=require)
-      const dbUrl = new URL(connectionString);
+      // Basic SSL fallback
       if (dbUrl.searchParams.get('sslmode') === 'require' || dbUrl.searchParams.get('ssl') === 'true') {
         poolConfig.ssl = { rejectUnauthorized: false };
       }
