@@ -6,32 +6,48 @@ const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
   const caCert = process.env.DATABASE_CA_CERT;
 
-  if (caCert) {
-    try {
+  // Handle missing connection string gracefully, especially during build time
+  if (!connectionString) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn("Warning: DATABASE_URL is not defined in environment variables. Database connections will fail.");
+    }
+    // Return a dummy client or let Prisma handle the missing URL (it will throw on first query)
+    return new PrismaClient();
+  }
+
+  try {
+    let poolConfig = {
+      connectionString: connectionString,
+    };
+
+    if (caCert) {
+      // Remove any search params that might conflict with manual SSL config
       const dbUrl = new URL(connectionString);
       dbUrl.searchParams.delete('sslrootcert');
       
-      const poolConfig = {
+      poolConfig = {
         connectionString: dbUrl.toString(),
         ssl: {
-          // Set ke false untuk menangani sertifikat self-signed Aiven di environment serverless
-          rejectUnauthorized: false, 
+          rejectUnauthorized: false, // Often required for managed databases
           ca: caCert.trim().replace(/\\n/g, '\n'),
         }
       };
-
-      const pool = new Pool(poolConfig);
-      const adapter = new PrismaPg(pool);
-      return new PrismaClient({ adapter });
-    } catch (err) {
-      console.error("Error parsing DATABASE_URL:", err);
+    } else {
+      // Fallback for connections that might need SSL but don't provide a CA cert
+      // (Common for Neon/Supabase with ?sslmode=require)
+      const dbUrl = new URL(connectionString);
+      if (dbUrl.searchParams.get('sslmode') === 'require' || dbUrl.searchParams.get('ssl') === 'true') {
+        poolConfig.ssl = { rejectUnauthorized: false };
+      }
     }
-  }
 
-  // Fallback jika tidak ada CA cert
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
+    const pool = new Pool(poolConfig);
+    const adapter = new PrismaPg(pool);
+    return new PrismaClient({ adapter });
+  } catch (err) {
+    console.error("Critical: Error initializing Prisma Client:", err.message);
+    return new PrismaClient(); // Final fallback
+  }
 }
 
 const globalForPrisma = globalThis

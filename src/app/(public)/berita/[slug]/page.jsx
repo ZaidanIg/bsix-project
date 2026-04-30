@@ -3,6 +3,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
 import prisma from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 import DOMPurify from "isomorphic-dompurify";
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";

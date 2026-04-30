@@ -3,6 +3,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
 import prisma from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 import { ValidateForm } from "./ValidateForm";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
