@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { BookOpen } from "lucide-react";
 
 export default async function GuruPublic() {

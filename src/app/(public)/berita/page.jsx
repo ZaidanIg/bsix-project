@@ -2,6 +2,8 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { Sprout, ArrowRight } from "lucide-react";
 
 export default async function BeritaListPublic() {
