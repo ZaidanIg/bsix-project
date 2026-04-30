@@ -26,7 +26,10 @@ export default function RegisterForm() {
 
   const nextStep = () => setStep(2);
   const prevStep = () => setStep(1);
-
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     const formElement = e.target;
     const formDataRaw = new FormData(formElement);
     const data = Object.fromEntries(formDataRaw.entries());
