@@ -9,62 +9,62 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toast from "react-hot-toast";
-import { FileUp, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { FileUp, ArrowRight, ArrowLeft, CheckCircle, FileText, X } from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [successId, setSuccessId] = useState(null);
+   const [successId, setSuccessId] = useState(null);
+   const [uploadedFiles, setUploadedFiles] = useState({
+     kkUrl: "",
+     aktaUrl: "",
+     ijazahUrl: ""
+   });
 
   const nextStep = () => setStep(2);
   const prevStep = () => setStep(1);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setProgress(0);
-
-    const formData = new FormData(e.target);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/spmb", true);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        setProgress(percentComplete);
+    const formElement = e.target;
+    const formDataRaw = new FormData(formElement);
+    const data = Object.fromEntries(formDataRaw.entries());
+    
+    // Gabungkan dengan URL file yang sudah diunggah
+    const payload = {
+      ...data,
+      documents: {
+        kk: uploadedFiles.kkUrl,
+        akta: uploadedFiles.aktaUrl,
+        ijazah: uploadedFiles.ijazahUrl
       }
     };
 
-    xhr.onload = () => {
-      try {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status >= 200 && xhr.status < 300) {
-          if (response.success) {
-            setSuccessId(response.data.id);
-            toast.success("Pendaftaran berhasil disubmit!");
-          } else {
-            toast.error(response.error || "Gagal menyimpan data");
-            setLoading(false);
-          }
-        } else {
-          toast.error(response.error || "Gagal mengunggah file");
-          setLoading(false);
-        }
-      } catch (e) {
-        toast.error("Format respon server tidak valid");
-        setLoading(false);
-      }
-    };
-
-    xhr.onerror = () => {
-      toast.error("Kesalahan jaringan");
+    if (!uploadedFiles.kkUrl || !uploadedFiles.aktaUrl || !uploadedFiles.ijazahUrl) {
       setLoading(false);
-    };
+      return toast.error("Semua dokumen wajib diunggah");
+    }
 
-    xhr.send(formData);
+    try {
+      const res = await fetch("/api/spmb", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const response = await res.json();
+      if (response.success) {
+        setSuccessId(response.data.id);
+        toast.success("Pendaftaran berhasil disubmit!");
+      } else {
+        toast.error(response.error || "Gagal menyimpan data");
+      }
+    } catch (err) {
+      toast.error("Terjadi kesalahan koneksi");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (successId) {
@@ -146,17 +146,57 @@ export default function RegisterForm() {
             <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-md text-sm text-yellow-800 dark:text-yellow-200 mb-4">
               Silakan unggah dokumen persyaratan dalam format PDF atau Gambar (JPG/PNG). Maksimal 2MB per file.
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="kkFile">Kartu Keluarga (KK)</Label>
-              <Input id="kkFile" name="kkFile" type="file" accept=".pdf,image/*" required={step===2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="aktaFile">Akta Kelahiran</Label>
-              <Input id="aktaFile" name="aktaFile" type="file" accept=".pdf,image/*" required={step===2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ijazahFile">SKL / Ijazah Terakhir</Label>
-              <Input id="ijazahFile" name="ijazahFile" type="file" accept=".pdf,image/*" required={step===2} />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Kartu Keluarga (KK)</Label>
+                {uploadedFiles.kkUrl ? (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                    <FileText className="h-4 w-4 text-green-600" />
+                    <span className="text-xs text-green-700 flex-1 truncate">KK Terunggah</span>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, kkUrl: ""})}><X className="h-3 w-3" /></Button>
+                  </div>
+                ) : (
+                  <UploadButton
+                    endpoint="documentUploader"
+                    onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, kkUrl: res[0].url})}
+                    onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                  />
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Akta Kelahiran</Label>
+                {uploadedFiles.aktaUrl ? (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                    <FileText className="h-4 w-4 text-green-600" />
+                    <span className="text-xs text-green-700 flex-1 truncate">Akta Terunggah</span>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, aktaUrl: ""})}><X className="h-3 w-3" /></Button>
+                  </div>
+                ) : (
+                  <UploadButton
+                    endpoint="documentUploader"
+                    onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, aktaUrl: res[0].url})}
+                    onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                  />
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>SKL / Ijazah Terakhir</Label>
+                {uploadedFiles.ijazahUrl ? (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                    <FileText className="h-4 w-4 text-green-600" />
+                    <span className="text-xs text-green-700 flex-1 truncate">Ijazah Terunggah</span>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, ijazahUrl: ""})}><X className="h-3 w-3" /></Button>
+                  </div>
+                ) : (
+                  <UploadButton
+                    endpoint="documentUploader"
+                    onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, ijazahUrl: res[0].url})}
+                    onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </CardContent>

@@ -8,46 +8,16 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   try {
-    const formData = await req.formData();
-    const fullName = formData.get("fullName");
-    const birthDate = formData.get("birthDate");
-    const birthPlace = formData.get("birthPlace");
-    const gender = formData.get("gender");
-    const address = formData.get("address");
-    const previousSchool = formData.get("previousSchool");
-    const parentName = formData.get("parentName");
-    const parentPhone = formData.get("parentPhone");
-
-    const kkFile = formData.get("kkFile");
-    const aktaFile = formData.get("aktaFile");
-    const ijazahFile = formData.get("ijazahFile");
+    const body = await req.json();
+    const { 
+      fullName, birthDate, birthPlace, gender, 
+      address, previousSchool, parentName, parentPhone,
+      documents 
+    } = body;
 
     if (!fullName || !birthDate || !address) {
       return NextResponse.json({ success: false, error: "Data wajib (Nama, Tanggal Lahir, Alamat) tidak boleh kosong" }, { status: 400 });
     }
-
-    const uploadDir = path.join(process.cwd(), "public/uploads/spmb");
-    if (!fs.existsSync(uploadDir)){
-        fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const saveFile = async (file, prefix) => {
-      if (!file || typeof file === "string") return null;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const filename = `${prefix}-${Date.now()}-${file.name.replace(/\\s+/g, '_')}`;
-      await writeFile(path.join(uploadDir, filename), buffer);
-      return `/uploads/spmb/${filename}`;
-    };
-
-    const kkUrl = await saveFile(kkFile, "kk");
-    const aktaUrl = await saveFile(aktaFile, "akta");
-    const ijazahUrl = await saveFile(ijazahFile, "ijazah");
-
-    const documents = {
-      kk: kkUrl,
-      akta: aktaUrl,
-      ijazah: ijazahUrl
-    };
 
     const spmb = await prisma.spmbRegistration.create({
       data: {
@@ -59,7 +29,7 @@ export async function POST(req) {
         previousSchool,
         parentName,
         parentPhone,
-        documents,
+        documents, // Sudah berupa JSON { kk: url, akta: url, ijazah: url }
       },
     });
 

@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import TipTapEditor from "@/components/editor/TipTapEditor";
-import { Edit, Plus, Trash2, ArrowLeft, Image as ImageIcon, CheckCircle, Clock } from "lucide-react";
+import { Edit, Plus, Trash2, ArrowLeft, Image as ImageIcon, CheckCircle, Clock, X } from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
 
 export default function ManajemenKonten() {
   const [articles, setArticles] = useState([]);
@@ -171,13 +172,41 @@ export default function ManajemenKonten() {
             <div className="space-y-2">
               <Label className="text-base font-semibold flex items-center gap-2">
                 <ImageIcon className="h-4 w-4 text-slate-500" />
-                URL Thumbnail (Opsional)
+                Thumbnail Artikel
               </Label>
-              <Input 
-                placeholder="https://contoh.com/gambar-header.jpg" 
-                value={formData.thumbnailUrl}
-                onChange={e => setFormData({...formData, thumbnailUrl: e.target.value})}
-              />
+              
+              {formData.thumbnailUrl ? (
+                <div className="relative w-full max-w-sm aspect-video rounded-lg overflow-hidden border">
+                  <img src={formData.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Button 
+                    type="button" 
+                    variant="destructive" 
+                    size="icon" 
+                    className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                    onClick={() => setFormData({...formData, thumbnailUrl: ""})}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 bg-slate-50 dark:bg-slate-900/50">
+                  <UploadButton
+                    endpoint="imageUploader"
+                    onClientUploadComplete={(res) => {
+                      setFormData({...formData, thumbnailUrl: res[0].url});
+                      toast.success("Gambar berhasil diunggah");
+                    }}
+                    onUploadError={(error) => {
+                      toast.error(`Gagal unggah: ${error.message}`);
+                    }}
+                    appearance={{
+                        button: "bg-primary text-white text-sm px-4 py-2 h-auto",
+                        allowedContent: "text-xs text-slate-500"
+                    }}
+                  />
+                  <p className="text-xs text-slate-500 mt-2">Maksimal 4MB (JPG, PNG, WebP)</p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
