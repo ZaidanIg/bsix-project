@@ -2,12 +2,12 @@ import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
-const prismaClientSingleton = () => {
-  // Bypassing self-signed certificate issues in Vercel/Managed DB environments
-  if (process.env.NODE_ENV === 'production') {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  }
+// Bypassing self-signed certificate issues in Vercel/Managed DB environments
+if (process.env.NODE_ENV === 'production') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
+const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
   const caCert = process.env.DATABASE_CA_CERT;
 
