@@ -1,0 +1,73 @@
+
+> bsix-project@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/src/app/globals.css': No serializer registered for PostCSSSyntaxError
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> webpack/lib/ModuleBuildError -> PostCSSSyntaxError
+Failed to compile.
+
+./src/app/globals.css:2:1
+Syntax error: /Users/zaidan/Documents/Skripsi Daud/bsix-project/src/app/globals.css The `outline-ring/50` class does not exist. If `outline-ring/50` is a custom class, make sure it is defined within a `@layer` directive.
+
+  1 | @import "shadcn/tailwind.css";
+> 2 | @tailwind base;
+    | ^
+  3 | @tailwind components;
+  4 | @tailwind utilities;
+
+./src/app/globals.css
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: No "exports" main defined in /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/tw-animate-css/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:313:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:604:13)
+    at resolveExports (node:internal/modules/cjs/loader:679:36)
+    at Module._findPath (node:internal/modules/cjs/loader:746:31)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1406:27)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/server/require-hook.js:55:36
+    at require.resolve (node:internal/modules/helpers:163:19)
+    at _resolve (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/jiti/dist/jiti.js:1:246378)
+    at jiti (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/jiti/dist/jiti.js:1:249092)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/tailwind.config.js:53:13
+    at tryRunOrWebpackError (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:312989)
+    at __webpack_require_module__ (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:131165)
+    at __nested_webpack_require_153728__ (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:130607)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:131454
+    at symbolIterator (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/neo-async/async.js:1:14444)
+    at done (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/neo-async/async.js:1:14824)
+    at Hook.eval [as callAsync] (eval at create (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:13:28858), <anonymous>:15:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:13:26012)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:130328
+    at symbolIterator (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/neo-async/async.js:1:14402)
+-- inner error --
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: No "exports" main defined in /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/tw-animate-css/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:313:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:604:13)
+    at resolveExports (node:internal/modules/cjs/loader:679:36)
+    at Module._findPath (node:internal/modules/cjs/loader:746:31)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1406:27)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/server/require-hook.js:55:36
+    at require.resolve (node:internal/modules/helpers:163:19)
+    at _resolve (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/jiti/dist/jiti.js:1:246378)
+    at jiti (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/jiti/dist/jiti.js:1:249092)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/tailwind.config.js:53:13
+    at Object.<anonymous> (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/src/app/globals.css:1:7)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:922493
+    at Hook.eval [as call] (eval at create (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:13:28636), <anonymous>:7:1)
+    at Hook.CALL_DELEGATE [as _call] (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:13:25906)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:131198
+    at tryRunOrWebpackError (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:312943)
+    at __webpack_require_module__ (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:131165)
+    at __nested_webpack_require_153728__ (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:130607)
+    at /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/webpack/bundle5.js:28:131454
+    at symbolIterator (/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/compiled/neo-async/async.js:1:14444)
+
+Generated code for /Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!/Users/zaidan/Documents/Skripsi Daud/bsix-project/src/app/globals.css
+
+Import trace for requested module:
+./src/app/globals.css
+
+
+> Build failed because of webpack errors

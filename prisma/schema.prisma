@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  GURU
+  SISWA
+}
+
+enum SubmissionStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum SPMBStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum FeedbackCategory {
+  ACADEMIC
+  FACILITY
+  BSIX
+  OTHER
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ValidationDecision {
+  VALIDATED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  nisNip    String   @unique
+  name      String
+  email     String?  @unique
+  password  String
+  role      Role
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacher           Teacher?
+  bvoicePortfolios  BVoicePortfolio[]
+  gradesValidations GradesValidation[]
+  articles          Article[]
+
+  @@map("users")
+}
+
+model Teacher {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nip      String  @unique
+  photo    String?
+  subject  String
+  bio      String?
+  isActive Boolean @default(true)
+
+  @@map("teachers")
+}
+
+model PilarBSix {
+  id          Int               @id @default(autoincrement())
+  code        String            @unique
+  name        String
+  description String
+  icon        String
+  colorHex    String
+  portfolios  BVoicePortfolio[]
+
+  @@map("pilar_bsix")
+}
+
+model BVoicePortfolio {
+  id          String           @id @default(cuid())
+  studentId   String
+  student     User             @relation(fields: [studentId], references: [id])
+  pilarId     Int
+  pilar       PilarBSix        @relation(fields: [pilarId], references: [id])
+  title       String           @db.VarChar(200)
+  description String           @db.VarChar(1000)
+  fileUrls    String[]
+  status      SubmissionStatus @default(PENDING)
+  submittedAt DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  validation GradesValidation?
+
+  @@map("bvoice_portfolio")
+}
+
+model GradesValidation {
+  id          String             @id @default(cuid())
+  portfolioId String             @unique
+  portfolio   BVoicePortfolio    @relation(fields: [portfolioId], references: [id])
+  teacherId   String
+  teacher     User               @relation(fields: [teacherId], references: [id])
+  score       Int?
+  feedback    String
+  decision    ValidationDecision
+  validatedAt DateTime           @default(now())
+
+  @@map("grades_validation")
+}
+
+model SpmbRegistration {
+  id                 String     @id @default(cuid())
+  registrationNumber String     @unique @default(cuid())
+  fullName           String
+  nik                String
+  birthDate          DateTime
+  birthPlace         String
+  gender             String
+  religion           String
+  address            String
+  previousSchool     String
+  graduationYear     Int
+  avgScore           Float
+  parentName         String
+  parentPhone        String
+  parentEmail        String?
+  documentUrls       String[]
+  status             SPMBStatus @default(PENDING)
+  adminNote          String?
+  registeredAt       DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@map("spmb_registrations")
+}
+
+model Feedback {
+  id        String           @id @default(cuid())
+  name      String
+  email     String?
+  category  FeedbackCategory
+  message   String           @db.VarChar(1000)
+  isRead    Boolean          @default(false)
+  isHandled Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("feedback")
+}
+
+model Article {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  content      String
+  thumbnailUrl String?
+  authorId     String
+  author       User          @relation(fields: [authorId], references: [id])
+  status       ArticleStatus @default(DRAFT)
+  publishedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("articles")
+}
