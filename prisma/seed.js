@@ -3,6 +3,9 @@ const { PrismaPg } = require('@prisma/adapter-pg')
 const { PrismaClient } = require('@prisma/client')
 const bcrypt = require('bcryptjs')
 
+// Bypassing self-signed certificate issues
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
