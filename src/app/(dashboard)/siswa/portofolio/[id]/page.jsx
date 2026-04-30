@@ -32,26 +32,26 @@ export default function DetailPortofolioSiswa() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchDetail();
-  }, [params.id]);
-
-  const fetchDetail = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(`/api/bvoice/${params.id}`);
-      const result = await res.json();
-      if (result.success) {
-        setData(result.data);
-      } else {
-        toast.error("Data tidak ditemukan");
-        router.push("/siswa/portofolio");
+    const fetchDetail = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/bvoice/${params.id}`);
+        const result = await res.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          toast.error("Data tidak ditemukan");
+          router.push("/siswa/portofolio");
+        }
+      } catch (err) {
+        toast.error("Gagal memuat detail");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      toast.error("Gagal memuat detail");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    fetchDetail();
+  }, [params.id, router]);
 
   if (isLoading) {
     return <div className="p-8 text-center text-slate-500">Memuat detail portofolio...</div>;
