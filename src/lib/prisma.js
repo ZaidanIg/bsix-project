@@ -3,6 +3,11 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
+  // Bypassing self-signed certificate issues in Vercel/Managed DB environments
+  if (process.env.NODE_ENV === 'production') {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  }
+
   const connectionString = process.env.DATABASE_URL;
   const caCert = process.env.DATABASE_CA_CERT;
 
@@ -27,10 +32,8 @@ const prismaClientSingleton = () => {
     };
 
     if (caCert || hasSslRootCert) {
-      // If we have a cert in ENV or the URL originally asked for one
       let caContent = caCert;
       
-      // Try to read ca.pem if caCert is not in ENV but was in URL
       if (!caContent && hasSslRootCert) {
         try {
           const fs = require('fs');
@@ -40,19 +43,29 @@ const prismaClientSingleton = () => {
             caContent = fs.readFileSync(caPath, 'utf8');
           }
         } catch (fsErr) {
-          console.warn("Warning: Could not read ca.pem from filesystem:", fsErr.message);
+          console.warn("Warning: Could not read ca.pem:", fsErr.message);
         }
       }
 
       poolConfig.ssl = {
-        rejectUnauthorized: false, // Maintain compatibility with managed DBs
-        ...(caContent ? { ca: caContent.trim().replace(/\\n/g, '\n') } : {})
+        rejectUnauthorized: false,
       };
+      
+      if (caContent) {
+        poolConfig.ssl.ca = caContent.trim().replace(/\\n/g, '\n');
+      }
     } else {
       // Basic SSL fallback
-      if (dbUrl.searchParams.get('sslmode') === 'require' || dbUrl.searchParams.get('ssl') === 'true') {
+      const sslMode = dbUrl.searchParams.get('sslmode');
+      const sslEnabled = dbUrl.searchParams.get('ssl');
+      
+      if (sslMode === 'require' || sslMode === 'prefer' || sslEnabled === 'true') {
         poolConfig.ssl = { rejectUnauthorized: false };
       }
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("Prisma Pool Config SSL:", JSON.stringify({ ...poolConfig.ssl, ca: poolConfig.ssl?.ca ? "[PRESENT]" : "[MISSING]" }));
     }
 
     const pool = new Pool(poolConfig);
