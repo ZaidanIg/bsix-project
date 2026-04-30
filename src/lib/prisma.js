@@ -6,21 +6,28 @@ const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
   const caCert = process.env.DATABASE_CA_CERT;
 
-  const poolConfig = { connectionString };
-
-  // Jika ada DATABASE_CA_CERT, gunakan untuk konfigurasi SSL
   if (caCert) {
-    // Bersihkan URL dari parameter sslrootcert jika ada agar tidak konflik
-    const cleanUrl = connectionString.split('&sslrootcert=')[0].split('?sslrootcert=')[0];
-    poolConfig.connectionString = cleanUrl;
-    
-    poolConfig.ssl = {
-      rejectUnauthorized: true,
-      ca: caCert.replace(/\\n/g, '\n'), // Handle escaped newlines
-    };
+    try {
+      const dbUrl = new URL(connectionString);
+      dbUrl.searchParams.delete('sslrootcert');
+      
+      const poolConfig = {
+        connectionString: dbUrl.toString(),
+        ssl: {
+          rejectUnauthorized: true,
+          ca: caCert.trim().replace(/\\n/g, '\n'),
+        }
+      };
+
+      const pool = new Pool(poolConfig);
+      const adapter = new PrismaPg(pool);
+      return new PrismaClient({ adapter });
+    } catch (err) {
+      console.error("Error parsing DATABASE_URL:", err);
+    }
   }
 
-  const pool = new Pool(poolConfig);
+  const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
