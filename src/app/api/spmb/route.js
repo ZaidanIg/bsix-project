@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { writeFile } from "fs/promises";
 import path from "path";
@@ -6,6 +8,24 @@ import fs from "fs";
 
 export const dynamic = "force-dynamic";
 
+// GET all registrations (admin only)
+export async function GET(req) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const registrations = await prisma.spmbRegistration.findMany({
+      orderBy: { registeredAt: "desc" },
+    });
+
+    return NextResponse.json({ success: true, data: registrations });
+  } catch (error) {
+    console.error("[SPMB_GET]", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
 export async function POST(req) {
   try {
     const body = await req.json();
