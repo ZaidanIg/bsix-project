@@ -19,6 +19,7 @@ export function Navbar() {
     { href: "/pendidik", label: "Guru" },
     { href: "/berita", label: "Berita" },
     { href: "/spmb", label: "SPMB" },
+    { href: "/kontak", label: "Kontak" },
   ];
 
   return (
