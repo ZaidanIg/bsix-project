@@ -29,7 +29,7 @@ export function Footer() {
               <li><Link href="/program-bsix" className="hover:text-green-400 transition-colors">Program B'Six</Link></li>
               <li><Link href="/galeri" className="hover:text-green-400 transition-colors">Galeri Portofolio</Link></li>
               <li><Link href="/spmb" className="hover:text-green-400 transition-colors">Informasi SPMB</Link></li>
-              <li><Link href="/kritik-saran" className="hover:text-green-400 transition-colors">Kritik & Saran</Link></li>
+              <li><Link href="/kontak" className="hover:text-green-400 transition-colors">Kritik & Saran</Link></li>
             </ul>
           </div>
 

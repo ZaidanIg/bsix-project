@@ -27,7 +27,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         // Allow public routes without token
-        const publicPaths = ['/login', '/program-bsix', '/galeri', '/pendidik', '/berita', '/spmb', '/kritik-saran', '/kontak']
+        const publicPaths = ['/login', '/program-bsix', '/galeri', '/pendidik', '/berita', '/spmb', '/kontak']
         const isPublic = req.nextUrl.pathname === '/' || publicPaths.some(p => req.nextUrl.pathname.startsWith(p))
         if (isPublic) return true
         return !!token
