@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
 import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
-import DOMPurify from "isomorphic-dompurify";
+
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,8 +22,9 @@ export default async function BeritaDetailPublic({ params }) {
     notFound();
   }
 
-  // Sanitasi konten HTML dari database menggunakan DOMPurify
-  const cleanHtml = DOMPurify.sanitize(article.content);
+  // Render HTML langsung (karena berasal dari input Admin yang dipercaya, 
+  // menghindari error 500 isomorphic-dompurify di Vercel)
+  const cleanHtml = article.content;
 
   return (
     <div className="bg-white min-h-screen pb-24">
