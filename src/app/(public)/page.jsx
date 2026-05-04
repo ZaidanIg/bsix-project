@@ -27,9 +27,9 @@ export default async function BerandaPublic() {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-green-900/80 to-blue-900/80 mix-blend-multiply" />
           <img 
-            src="https://images.unsplash.com/photo-1595188544569-808fc52c1e6c?auto=format&fit=crop&q=80" 
+            src="/binaraja.webp" 
             alt="Pertanian Modern" 
-            className="w-full h-full object-cover opacity-40"
+            className="w-full h-full object-cover opacity-50"
           />
         </div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl space-y-8">

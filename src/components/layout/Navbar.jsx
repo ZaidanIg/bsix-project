@@ -27,8 +27,8 @@ export function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-green-600 p-2 rounded-lg text-white">
-              <Sprout className="h-5 w-5" />
+            <div className="bg-white p-1 rounded-lg">
+              <img src="/logo.png" alt="Logo BMSF" className="h-8 w-8 object-contain" />
             </div>
             <Link href="/" className="flex flex-col">
               <span className="font-bold text-xl leading-tight text-slate-900 tracking-tight">BMSF</span>
