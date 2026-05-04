@@ -38,15 +38,15 @@ export function Footer() {
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                <span>Jl. Cijeungjing, Kec. Jatigede, Kabupaten Sumedang, Jawa Barat 45377</span>
+                <span>Dusun Cihegar RT 019 RW 005, Desa Mekarasih, Kecamatan Jatigede, Kabupaten Sumedang, Jawa Barat - 45377</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-green-500 shrink-0" />
-                <span>(0261) 123456</span>
+                <span>+6285722904667</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-green-500 shrink-0" />
-                <span>info@bmsf-jatigede.sch.id</span>
+                <span>smpbinaharapanjatigede@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -54,16 +54,15 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-6">Sosial Media</h3>
             <div className="flex flex-col gap-3 text-sm">
-              <a href="#" className="hover:text-green-400 transition-colors">Instagram</a>
-              <a href="#" className="hover:text-blue-400 transition-colors">Facebook</a>
-              <a href="#" className="hover:text-red-400 transition-colors">Youtube</a>
+              <a href="#" className="hover:text-green-400 transition-colors">Instagram : @smp_binaraja</a>
+              <a href="#" className="hover:text-blue-400 transition-colors">Facebook : SMP Bina Harapan Jatigede</a>
+              <a href="#" className="hover:text-red-400 transition-colors">Tiktok : @smp_binaraj</a>
             </div>
           </div>
         </div>
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <p>&copy; 2025 SMP Bina Harapan Jatigede (BMSF). All rights reserved.</p>
-          <p>Berdasarkan Skripsi Daud Ramdani (2025).</p>
+          <p>&copy; 2026 artefact. All rights reserved.</p>
         </div>
       </div>
     </footer>

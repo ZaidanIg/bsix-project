@@ -71,7 +71,7 @@ export default async function BerandaPublic() {
             </div>
             <div className="space-y-2">
               <Calendar className="h-8 w-8 text-orange-600 mx-auto" />
-              <h3 className="text-3xl font-bold text-slate-900">2021</h3>
+              <h3 className="text-3xl font-bold text-slate-900">2017</h3>
               <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">Tahun Berdiri</p>
             </div>
             <div className="space-y-2">
