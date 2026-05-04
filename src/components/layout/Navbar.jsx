@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Sprout } from "lucide-react";
@@ -10,6 +11,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 export function Navbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
@@ -49,9 +51,15 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link href="/login">
-              <Button className="bg-blue-600 hover:bg-blue-700 ml-4 rounded-full px-6">Masuk</Button>
-            </Link>
+            {session ? (
+              <Link href={`/${session.user.role.toLowerCase()}`}>
+                <Button className="bg-blue-600 hover:bg-blue-700 ml-4 rounded-full px-6">Dashboard</Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button className="bg-blue-600 hover:bg-blue-700 ml-4 rounded-full px-6">Masuk</Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Nav */}
@@ -78,9 +86,15 @@ export function Navbar() {
                     </Link>
                   ))}
                   <div className="h-px bg-slate-200 my-4" />
-                  <Link href="/login" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Masuk ke Dashboard</Button>
-                  </Link>
+                  {session ? (
+                    <Link href={`/${session.user.role.toLowerCase()}`} onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">Masuk ke Dashboard</Button>
+                    </Link>
+                  ) : (
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">Masuk</Button>
+                    </Link>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

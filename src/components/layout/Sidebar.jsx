@@ -15,7 +15,8 @@ import {
   BarChart,
   Upload,
   User,
-  LogOut
+  LogOut,
+  Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,14 @@ export function Sidebar({ user, onMobileItemClick }) {
             </Link>
           );
         })}
+        <div className="h-px bg-slate-800 my-4" />
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+        >
+          <Globe className="h-4 w-4" />
+          Halaman Public
+        </Link>
       </nav>
 
       {/* User Info & Logout */}
