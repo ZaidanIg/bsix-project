@@ -51,9 +51,12 @@ export function Sidebar({ user, onMobileItemClick }) {
   return (
     <div className="flex flex-col h-full w-[240px] bg-slate-900 text-slate-100">
       {/* Logo Area */}
-      <div className="p-6 border-b border-slate-800">
-        <h1 className="text-2xl font-bold text-white tracking-tight">BMSF</h1>
-        <p className="text-xs text-slate-400 mt-1">SMP Bina Harapan Jatigede</p>
+      <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+        <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain bg-white rounded-md p-1" />
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">BMSF</h1>
+          <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">SMP Bina Harapan Jatigede</p>
+        </div>
       </div>
 
       {/* Navigation */}

@@ -9,8 +9,8 @@ export function Footer() {
           
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-2 text-white mb-6">
-              <div className="bg-green-600 p-1.5 rounded-md">
-                <Sprout className="h-6 w-6" />
+              <div className="bg-white p-1 rounded-md">
+                <img src="/logo.png" alt="Logo BMSF" className="h-6 w-6 object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-xl leading-tight tracking-tight">BMSF</span>

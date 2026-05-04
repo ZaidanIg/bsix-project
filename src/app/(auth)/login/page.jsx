@@ -81,7 +81,8 @@ export default function LoginPage() {
       </Link>
 
       <Card className="w-full max-w-md shadow-lg border-t-4 border-t-primary overflow-hidden">
-        <div className="bg-primary/5 p-6 border-b text-center space-y-1">
+        <div className="bg-primary/5 p-6 border-b flex flex-col items-center justify-center text-center space-y-2">
+          <img src="/logo.png" alt="Logo BMSF" className="h-12 w-12 object-contain mb-1" />
           <CardTitle className="text-2xl font-bold tracking-tight">Portal BMSF</CardTitle>
           <CardDescription>
             SMP Bina Harapan Jatigede
