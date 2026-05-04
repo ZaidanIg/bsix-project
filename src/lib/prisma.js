@@ -29,6 +29,9 @@ const prismaClientSingleton = () => {
 
     let poolConfig = {
       connectionString: dbUrl.toString(),
+      max: 2, // Limit connections per Vercel function instance
+      idleTimeoutMillis: 3000, // Close idle connections quickly
+      connectionTimeoutMillis: 5000, // Timeout faster if DB is unreachable
     };
 
     if (caCert || hasSslRootCert) {
