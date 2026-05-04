@@ -49,7 +49,7 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        setError("NIS/NIP atau Password salah");
+        setError(res.error === "CredentialsSignin" ? "NIS/NIP atau Password salah" : res.error);
         setIsLoading(false);
       } else {
         const session = await getSession();
