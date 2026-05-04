@@ -27,7 +27,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         // Allow public routes without token
-        const publicPaths = ['/login', '/program-bsix', '/galeri', '/pendidik', '/berita', '/spmb', '/kritik-saran']
+        const publicPaths = ['/login', '/program-bsix', '/galeri', '/pendidik', '/berita', '/spmb', '/kritik-saran', '/kontak']
         const isPublic = req.nextUrl.pathname === '/' || publicPaths.some(p => req.nextUrl.pathname.startsWith(p))
         if (isPublic) return true
         return !!token
@@ -37,5 +37,5 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|public).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.webp$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.ico$).*)'],
 }
