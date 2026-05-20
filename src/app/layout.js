@@ -18,12 +18,23 @@ export const metadata = {
   description: "Sistem Informasi Manajemen Sekolah SMP Bina Harapan Jatigede",
 };
 
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="id">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextSSRPlugin
+          /**
+           * The `extractRouterConfig` will extract the route config from the
+           * router, so we don't have to pass it to the client.
+           */
+          routerConfig={extractRouterConfig(ourFileRouter)}
+        />
         <Providers>
           {children}
         </Providers>

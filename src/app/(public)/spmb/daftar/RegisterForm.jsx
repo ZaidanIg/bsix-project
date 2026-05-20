@@ -105,16 +105,6 @@ export default function RegisterForm() {
               <Label htmlFor="fullName">Nama Lengkap</Label>
               <Input id="fullName" name="fullName" required={step===1} placeholder="Cth: Ahmad Budi" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="birthPlace">Tempat Lahir</Label>
-                <Input id="birthPlace" name="birthPlace" required={step===1} placeholder="Bandung" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="birthDate">Tanggal Lahir</Label>
-                <Input id="birthDate" name="birthDate" type="date" required={step===1} />
-              </div>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="gender">Jenis Kelamin</Label>
               <Select name="gender" required={step===1}>
@@ -126,9 +116,71 @@ export default function RegisterForm() {
               </Select>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="nisn">NISN(Nomor Induk Siswa Nasional)</Label>
+              <Input id="nisn" name="nisn" required={step===1} placeholder="123xxxxx" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nik">NIK(Nomor Induk Kependudukan)</Label>
+              <Input id="nik" name="nik" required={step===1} placeholder="3211xxxxxx" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="birthPlace">Tempat Lahir</Label>
+                <Input id="birthPlace" name="birthPlace" required={step===1} placeholder="Bandung" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="birthDate">Tanggal Lahir</Label>
+                <Input id="birthDate" name="birthDate" type="date" required={step===1} />
+              </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="agama">Agama</Label>
+                <Select name="agama" required={step===1}>
+                    <SelectTrigger><SelectValue placeholder="Pilih Agama" /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Islam">Islam</SelectItem>
+                        <SelectItem value="Kristen">Kristen</SelectItem>
+                        <SelectItem value="Katholik">Katholik</SelectItem>
+                        <SelectItem value="Hindu">Hindu</SelectItem>
+                        <SelectItem value="Buddha">Buddha</SelectItem>
+                        <SelectItem value="Konghucu">Konghucu</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="address">Alamat Lengkap</Label>
               <Textarea id="address" name="address" required={step===1} rows={3} placeholder="Jl. Raya Jatigede No. 123..." />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="tempatTinggal">Tempat Tinggal</Label>
+              <Select name="tempatTinggal" required={step===1}>
+                <SelectTrigger><SelectValue placeholder="Pilih Tempat Tinggal" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Bersama Orang Tua">Bersama Orang Tua</SelectItem>
+                  <SelectItem value="Wali">Wali</SelectItem>
+                  <SelectItem value="Asrama">Asrama</SelectItem>
+                  <SelectItem value="Sendiri">Sendiri</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="transportasi">Transportaasi</Label>
+              <Select name="transportasi" required={step===1}>
+                <SelectTrigger><SelectValue placeholder="Pilih Transportasi" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Angkutan Umum">Angkutan Umum</SelectItem>
+                  <SelectItem value="Kendaraan Pribadi">Kendaraan Pribadi</SelectItem>
+                  <SelectItem value="Sepeda Motor">Sepeda Motor</SelectItem>
+                  <SelectItem value="Sepeda">Sepeda</SelectItem>
+                  <SelectItem value="Jalan Kaki">Jalan Kaki</SelectItem>
+                  <SelectItem value="Lainnya">Lainnya</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="parentPhone">No. HP Orang Tua / Wali</Label>
+                <Input id="parentPhone" name="parentPhone" required={step===1} placeholder="08123456789" />
+              </div>
             <div className="space-y-2">
               <Label htmlFor="previousSchool">Asal Sekolah</Label>
               <Input id="previousSchool" name="previousSchool" required={step===1} placeholder="SDN 1 Jatigede" />
@@ -137,10 +189,6 @@ export default function RegisterForm() {
               <div className="space-y-2">
                 <Label htmlFor="parentName">Nama Orang Tua / Wali</Label>
                 <Input id="parentName" name="parentName" required={step===1} placeholder="Budi Santoso" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="parentPhone">No. HP Orang Tua / Wali</Label>
-                <Input id="parentPhone" name="parentPhone" required={step===1} placeholder="08123456789" />
               </div>
             </div>
           </div>

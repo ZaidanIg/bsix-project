@@ -7,7 +7,7 @@ export default async function GuruPublic() {
   const teachers = await prisma.teacher.findMany({
     where: { isActive: true },
     include: {
-      user: { select: { name: true } }
+      user: { select: { name: true, image: true } }
     },
     orderBy: { user: { name: "asc" } }
   });
@@ -25,6 +25,7 @@ export default async function GuruPublic() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {teachers.map(teacher => {
             const initials = teacher.user.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+            const profileImage = teacher.user.image || teacher.photo;
             
             return (
               <div key={teacher.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-md transition-shadow flex flex-col group">
@@ -36,8 +37,8 @@ export default async function GuruPublic() {
                 {/* Avatar */}
                 <div className="flex justify-center -mt-12 relative z-10 px-4">
                   <div className="w-24 h-24 rounded-full border-4 border-white shadow-sm bg-slate-100 overflow-hidden flex items-center justify-center">
-                    {teacher.photo ? (
-                      <img src={teacher.photo} alt={teacher.user.name} className="w-full h-full object-cover" />
+                    {profileImage ? (
+                      <img src={profileImage} alt={teacher.user.name} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-2xl font-bold text-slate-400">{initials}</span>
                     )}

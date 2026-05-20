@@ -53,6 +53,17 @@ export async function POST(req) {
       },
     });
 
+    // Create Notification for Admin
+    await prisma.notification.create({
+      data: {
+        type: "SPMB",
+        title: "Pendaftaran SPMB Baru",
+        message: `Pendaftaran baru atas nama ${fullName}`,
+        link: "/admin/spmb",
+        role: "ADMIN"
+      }
+    });
+
     return NextResponse.json({ success: true, data: { id: spmb.id } });
   } catch (error) {
     console.error("SPMB register error:", error);

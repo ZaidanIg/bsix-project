@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
 import toast from "react-hot-toast";
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import TipTapEditor from "@/components/editor/TipTapEditor";
-import { Edit, Plus, Trash2, ArrowLeft, Image as ImageIcon, CheckCircle, Clock, X } from "lucide-react";
+import { Edit, Plus, Trash2, ArrowLeft, Image as ImageIcon, CheckCircle, Clock, X, Loader2 } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 
 export default function ManajemenKonten() {
@@ -23,6 +23,8 @@ export default function ManajemenKonten() {
   const [currentArticle, setCurrentArticle] = useState(null); // null = mode tambah baru
   const [formData, setFormData] = useState({ title: "", content: "", thumbnailUrl: "", status: "DRAFT" });
   const [isSaving, setIsSaving] = useState(false);
+
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
 
   const fetchArticles = async () => {
     setIsLoading(true);
@@ -189,19 +191,35 @@ export default function ManajemenKonten() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden">
+                  {isUploadingThumbnail && (
+                    <div className="absolute inset-0 bg-white/60 dark:bg-black/60 flex flex-col items-center justify-center z-10 backdrop-blur-[1px]">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Mengunggah gambar...</p>
+                    </div>
+                  )}
                   <UploadButton
                     endpoint="imageUploader"
+                    onUploadBegin={() => setIsUploadingThumbnail(true)}
                     onClientUploadComplete={(res) => {
+                      setIsUploadingThumbnail(false);
                       setFormData({...formData, thumbnailUrl: res[0].url});
                       toast.success("Gambar berhasil diunggah");
                     }}
                     onUploadError={(error) => {
+                      setIsUploadingThumbnail(false);
                       toast.error(`Gagal unggah: ${error.message}`);
                     }}
                     appearance={{
-                        button: "bg-primary text-white text-sm px-4 py-2 h-auto",
+                        button: `bg-primary text-white text-sm px-4 py-2 h-auto ${isUploadingThumbnail ? 'opacity-50 cursor-not-allowed' : ''}`,
                         allowedContent: "text-xs text-slate-500"
+                    }}
+                    content={{
+                      button({ ready }) {
+                        if (isUploadingThumbnail) return "Loading...";
+                        if (ready) return "Upload Thumbnail";
+                        return "Menyiapkan...";
+                      }
                     }}
                   />
                   <p className="text-xs text-slate-500 mt-2">Maksimal 4MB (JPG, PNG, WebP)</p>

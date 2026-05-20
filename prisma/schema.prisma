@@ -6,56 +6,21 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  GURU
-  SISWA
-}
-
-enum SubmissionStatus {
-  PENDING
-  VALIDATED
-  REJECTED
-}
-
-enum SPMBStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
-enum FeedbackCategory {
-  ACADEMIC
-  FACILITY
-  BSIX
-  OTHER
-}
-
-enum ArticleStatus {
-  DRAFT
-  PUBLISHED
-}
-
-enum ValidationDecision {
-  VALIDATED
-  REJECTED
-}
-
 model User {
-  id        String   @id @default(cuid())
-  nisNip    String   @unique
-  name      String
-  email     String?  @unique
-  password  String
-  role      Role
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  teacher           Teacher?
+  id                String             @id @default(cuid())
+  nisNip            String             @unique
+  name              String
+  email             String?            @unique
+  password          String
+  role              Role
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  image             String?
+  articles          Article[]
   bvoicePortfolios  BVoicePortfolio[]
   gradesValidations GradesValidation[]
-  articles          Article[]
+  teacher           Teacher?
 
   @@map("users")
 }
@@ -63,12 +28,12 @@ model User {
 model Teacher {
   id       String  @id @default(cuid())
   userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   nip      String  @unique
   photo    String?
   subject  String
   bio      String?
   isActive Boolean @default(true)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("teachers")
 }
@@ -86,19 +51,18 @@ model PilarBSix {
 }
 
 model BVoicePortfolio {
-  id          String           @id @default(cuid())
+  id          String            @id @default(cuid())
   studentId   String
-  student     User             @relation(fields: [studentId], references: [id])
   pilarId     Int
-  pilar       PilarBSix        @relation(fields: [pilarId], references: [id])
-  title       String           @db.VarChar(200)
-  description String           @db.VarChar(1000)
+  title       String            @db.VarChar(200)
+  description String            @db.VarChar(1000)
   fileUrls    String[]
-  status      SubmissionStatus @default(PENDING)
-  submittedAt DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  validation GradesValidation?
+  status      SubmissionStatus  @default(PENDING)
+  submittedAt DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  pilar       PilarBSix         @relation(fields: [pilarId], references: [id])
+  student     User              @relation(fields: [studentId], references: [id])
+  validation  GradesValidation?
 
   @@map("bvoice_portfolio")
 }
@@ -106,13 +70,13 @@ model BVoicePortfolio {
 model GradesValidation {
   id          String             @id @default(cuid())
   portfolioId String             @unique
-  portfolio   BVoicePortfolio    @relation(fields: [portfolioId], references: [id])
   teacherId   String
-  teacher     User               @relation(fields: [teacherId], references: [id])
   score       Int?
   feedback    String
   decision    ValidationDecision
   validatedAt DateTime           @default(now())
+  portfolio   BVoicePortfolio    @relation(fields: [portfolioId], references: [id])
+  teacher     User               @relation(fields: [teacherId], references: [id])
 
   @@map("grades_validation")
 }
@@ -162,11 +126,78 @@ model Article {
   content      String
   thumbnailUrl String?
   authorId     String
-  author       User          @relation(fields: [authorId], references: [id])
   status       ArticleStatus @default(DRAFT)
   publishedAt  DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  author       User          @relation(fields: [authorId], references: [id])
 
   @@map("articles")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean          @default(false)
+  role      Role?
+  createdAt DateTime         @default(now())
+  targetId  String?
+
+  @@map("notifications")
+}
+
+model Facility {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.VarChar(500)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("facilities")
+}
+
+enum Role {
+  ADMIN
+  GURU
+  SISWA
+}
+
+enum SubmissionStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum SPMBStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum FeedbackCategory {
+  ACADEMIC
+  FACILITY
+  BSIX
+  OTHER
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ValidationDecision {
+  VALIDATED
+  REJECTED
+}
+
+enum NotificationType {
+  FEEDBACK
+  BVOICE
+  SPMB
 }

@@ -1,6 +1,7 @@
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
+import { logger } from './logger'
 
 // Bypassing self-signed certificate issues in Vercel/Managed DB environments
 if (process.env.NODE_ENV === 'production') {
@@ -14,7 +15,7 @@ const prismaClientSingleton = () => {
   // Handle missing connection string gracefully, especially during build time
   if (!connectionString) {
     if (process.env.NODE_ENV === 'production') {
-      console.warn("Warning: DATABASE_URL is not defined in environment variables. Database connections will fail.");
+      logger.warn("DATABASE_URL is not defined in environment variables. Database connections will fail.");
     }
     // Return a dummy client or let Prisma handle the missing URL (it will throw on first query)
     return new PrismaClient();
@@ -24,14 +25,15 @@ const prismaClientSingleton = () => {
     const dbUrl = new URL(connectionString);
     const hasSslRootCert = dbUrl.searchParams.has('sslrootcert');
     
-    // Always remove sslrootcert from URL to prevent pg from trying to read a local file
+    // Always remove sslrootcert and sslmode from URL to prevent pg-connection-string from overriding custom SSL config
     dbUrl.searchParams.delete('sslrootcert');
+    dbUrl.searchParams.delete('sslmode');
 
     let poolConfig = {
       connectionString: dbUrl.toString(),
       max: 2, // Limit connections per Vercel function instance
       idleTimeoutMillis: 3000, // Close idle connections quickly
-      connectionTimeoutMillis: 5000, // Timeout faster if DB is unreachable
+      connectionTimeoutMillis: 15000, // Memberi waktu lebih lama untuk koneksi awal
     };
 
     if (caCert || hasSslRootCert) {
@@ -46,7 +48,7 @@ const prismaClientSingleton = () => {
             caContent = fs.readFileSync(caPath, 'utf8');
           }
         } catch (fsErr) {
-          console.warn("Warning: Could not read ca.pem:", fsErr.message);
+          logger.warn(`Could not read ca.pem: ${fsErr.message}`);
         }
       }
 
@@ -68,14 +70,17 @@ const prismaClientSingleton = () => {
     }
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log("Prisma Pool Config SSL:", JSON.stringify({ ...poolConfig.ssl, ca: poolConfig.ssl?.ca ? "[PRESENT]" : "[MISSING]" }));
+      logger.info("Prisma Pool Config SSL initialized", { 
+        ...poolConfig.ssl, 
+        ca: poolConfig.ssl?.ca ? "[PRESENT]" : "[MISSING]" 
+      });
     }
 
     const pool = new Pool(poolConfig);
     const adapter = new PrismaPg(pool);
     return new PrismaClient({ adapter });
   } catch (err) {
-    console.error("Critical: Error initializing Prisma Client:", err.message);
+    logger.error("Error initializing Prisma Client", err);
     return new PrismaClient(); // Final fallback
   }
 }

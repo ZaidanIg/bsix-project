@@ -39,6 +39,17 @@ export async function POST(req) {
       }
     });
 
+    // Create Notification for Admin
+    await prisma.notification.create({
+      data: {
+        type: "FEEDBACK",
+        title: "Feedback Baru",
+        message: `Feedback baru dari ${name} kategori ${category}`,
+        link: "/admin/feedback",
+        role: "ADMIN"
+      }
+    });
+
     return NextResponse.json({ success: true, data: newFeedback });
   } catch (error) {
     console.error("[FEEDBACK_POST]", error);

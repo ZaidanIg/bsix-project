@@ -11,6 +11,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, X, Eye, Trash2, Edit, ArrowLeft, Search, Users, Clock, CheckCircle, XCircle, Save, FileText, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function AdminSPMBPage() {
   const [registrations, setRegistrations] = useState([]);
@@ -23,6 +33,12 @@ export default function AdminSPMBPage() {
   const [viewMode, setViewMode] = useState("list"); // "list" | "detail" | "edit"
   const [editData, setEditData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+
+  // States untuk Konfirmasi
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [regToDelete, setRegToDelete] = useState(null);
+  const [isStatusConfirmOpen, setIsStatusConfirmOpen] = useState(false);
+  const [statusToUpdate, setStatusToUpdate] = useState({ id: null, status: null });
 
   const fetchRegistrations = useCallback(async () => {
     setIsLoading(true);
@@ -64,7 +80,8 @@ export default function AdminSPMBPage() {
   };
 
   // Status update
-  const handleStatusUpdate = async (id, status) => {
+  const handleStatusUpdate = async () => {
+    const { id, status } = statusToUpdate;
     try {
       const res = await fetch(`/api/spmb/${id}`, {
         method: "PATCH",
@@ -79,12 +96,14 @@ export default function AdminSPMBPage() {
       }
     } catch {
       toast.error("Gagal memperbarui status");
+    } finally {
+      setIsStatusConfirmOpen(false);
     }
   };
 
   // Delete
-  const handleDelete = async (id) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus data pendaftaran ini? Tindakan ini tidak dapat dibatalkan.")) return;
+  const handleDelete = async () => {
+    const id = regToDelete.id;
     try {
       const res = await fetch(`/api/spmb/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
@@ -94,6 +113,8 @@ export default function AdminSPMBPage() {
       fetchRegistrations();
     } catch {
       toast.error("Gagal menghapus data");
+    } finally {
+      setIsDeleteOpen(false);
     }
   };
 
@@ -165,7 +186,10 @@ export default function AdminSPMBPage() {
             <Button variant="outline" onClick={() => openEdit(selectedReg)}>
               <Edit className="h-4 w-4 mr-2" /> Edit
             </Button>
-            <Button variant="destructive" onClick={() => handleDelete(selectedReg.id)}>
+            <Button variant="destructive" onClick={() => {
+              setRegToDelete(selectedReg);
+              setIsDeleteOpen(true);
+            }}>
               <Trash2 className="h-4 w-4 mr-2" /> Hapus
             </Button>
           </div>
@@ -181,10 +205,16 @@ export default function AdminSPMBPage() {
               </div>
               {selectedReg.status === "PENDING" && (
                 <div className="flex gap-2">
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleStatusUpdate(selectedReg.id, "ACCEPTED")}>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => {
+                    setStatusToUpdate({ id: selectedReg.id, status: "ACCEPTED" });
+                    setIsStatusConfirmOpen(true);
+                  }}>
                     <Check className="h-4 w-4 mr-1" /> Terima
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleStatusUpdate(selectedReg.id, "REJECTED")}>
+                  <Button size="sm" variant="destructive" onClick={() => {
+                    setStatusToUpdate({ id: selectedReg.id, status: "REJECTED" });
+                    setIsStatusConfirmOpen(true);
+                  }}>
                     <X className="h-4 w-4 mr-1" /> Tolak
                   </Button>
                 </div>
@@ -439,15 +469,24 @@ export default function AdminSPMBPage() {
                           </Button>
                           {reg.status === "PENDING" && (
                             <>
-                              <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" title="Terima" onClick={() => handleStatusUpdate(reg.id, "ACCEPTED")}>
+                              <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" title="Terima" onClick={() => {
+                                setStatusToUpdate({ id: reg.id, status: "ACCEPTED" });
+                                setIsStatusConfirmOpen(true);
+                              }}>
                                 <Check className="h-4 w-4" />
                               </Button>
-                              <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600" title="Tolak" onClick={() => handleStatusUpdate(reg.id, "REJECTED")}>
+                              <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600" title="Tolak" onClick={() => {
+                                setStatusToUpdate({ id: reg.id, status: "REJECTED" });
+                                setIsStatusConfirmOpen(true);
+                              }}>
                                 <X className="h-4 w-4" />
                               </Button>
                             </>
                           )}
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" title="Hapus" onClick={() => handleDelete(reg.id)}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" title="Hapus" onClick={() => {
+                            setRegToDelete(reg);
+                            setIsDeleteOpen(true);
+                          }}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -460,6 +499,47 @@ export default function AdminSPMBPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* --- MODALS --- */}
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Data Pendaftaran?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus data pendaftaran <strong>{regToDelete?.fullName}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Ya, Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Status Update Confirmation */}
+      <AlertDialog open={isStatusConfirmOpen} onOpenChange={setIsStatusConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Perubahan Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin mengubah status pendaftaran <strong>{registrations.find(r => r.id === statusToUpdate.id)?.fullName}</strong> menjadi <strong>{statusToUpdate.status === "ACCEPTED" ? "Diterima" : "Ditolak"}</strong>?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleStatusUpdate} 
+              className={statusToUpdate.status === "ACCEPTED" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
+            >
+              Konfirmasi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -10,9 +10,7 @@ import {
   Save,
   Loader2,
   KeyRound,
-  BookOpen,
-  FileText,
-  Badge,
+  ShieldAlert,
 } from "lucide-react";
 import { 
   Card, 
@@ -25,7 +23,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import { UploadButton } from "@/lib/uploadthing";
 import { 
@@ -34,7 +31,7 @@ import {
   AvatarFallback 
 } from "@/components/ui/avatar";
 
-export default function ProfilGuruPage() {
+export default function ProfilAdminPage() {
   const { data: session, update } = useSession();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,8 +42,6 @@ export default function ProfilGuruPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
-    bio: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: ""
@@ -66,9 +61,7 @@ export default function ProfilGuruPage() {
         setFormData(prev => ({
           ...prev,
           name: result.data.name,
-          email: result.data.email || "",
-          subject: result.data.teacher?.subject || "",
-          bio: result.data.teacher?.bio || ""
+          email: result.data.email || ""
         }));
       }
     } catch (err) {
@@ -109,9 +102,7 @@ export default function ProfilGuruPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          bio: formData.bio
+          email: formData.email
         })
       });
       
@@ -179,26 +170,26 @@ export default function ProfilGuruPage() {
     .map((n) => n[0])
     .join("")
     .substring(0, 2)
-    .toUpperCase() || "U";
+    .toUpperCase() || "A";
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Profil Guru</h1>
-        <p className="text-slate-500">Kelola informasi profesional dan akun Anda.</p>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Profil Admin</h1>
+        <p className="text-slate-500">Kelola informasi akun administrator Anda.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Sidebar Info */}
         <div className="md:col-span-1 space-y-6">
           <Card className="text-center overflow-hidden border-none shadow-sm">
-            <div className="h-24 bg-blue-600" />
-            <CardContent className="-mt-12 pb-6 flex flex-col items-center">
+            <div className="h-20 bg-slate-800" />
+            <CardContent className="-mt-10 pb-6 flex flex-col items-center">
               <div className="flex flex-col items-center">
                 <div className="relative">
                   <Avatar className="w-28 h-28 border-4 border-white shadow-xl relative overflow-hidden">
                     <AvatarImage src={profile?.image} alt={profile?.name} className="object-cover" />
-                    <AvatarFallback className="bg-blue-100 text-blue-700 text-3xl font-bold">
+                    <AvatarFallback className="bg-slate-100 text-slate-700 text-3xl font-bold">
                       {initials}
                     </AvatarFallback>
                     {isUploading && (
@@ -223,7 +214,7 @@ export default function ProfilGuruPage() {
                       toast.error(`Gagal upload: ${error.message}. Pastikan UPLOADTHING_TOKEN sudah diatur.`);
                     }}
                     appearance={{
-                      button: `bg-blue-600 hover:bg-blue-700 text-white rounded-full text-[10px] h-8 px-4 transition-all shadow-sm font-bold uppercase tracking-wider ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`,
+                      button: `bg-slate-800 hover:bg-slate-900 text-white rounded-full text-[10px] h-8 px-4 transition-all shadow-sm font-bold uppercase tracking-wider ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`,
                       allowedContent: "hidden",
                     }}
                     content={{
@@ -236,28 +227,20 @@ export default function ProfilGuruPage() {
                   />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-slate-900">{profile?.name}</h2>
-              <Badge variant="secondary" className="mt-1 bg-blue-100 text-blue-700 hover:bg-blue-100 uppercase tracking-wider text-[10px] font-bold">
-                Tenaga Pendidik
-              </Badge>
+              <h2 className="text-xl font-bold text-slate-900 mt-4">{profile?.name}</h2>
+              <div className="flex items-center gap-1.5 justify-center mt-1 text-slate-500">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Administrator</span>
+              </div>
               
-              <div className="mt-8 pt-6 border-t border-slate-100 space-y-5 text-left">
+              <div className="mt-8 pt-6 border-t border-slate-100 space-y-5 text-left w-full">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">NIP (User ID)</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">ID Admin</p>
                     <p className="text-sm font-mono font-medium">{profile?.nisNip}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-                    <BookOpen className="w-4 h-4 text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Mata Pelajaran</p>
-                    <p className="text-sm font-medium">{profile?.teacher?.subject || "-"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -265,7 +248,7 @@ export default function ProfilGuruPage() {
                     <Calendar className="w-4 h-4 text-slate-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Bergabung</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Akses Sejak</p>
                     <p className="text-sm font-medium">{new Date(profile?.createdAt).toLocaleDateString("id-ID", { month: 'long', year: 'numeric' })}</p>
                   </div>
                 </div>
@@ -279,10 +262,10 @@ export default function ProfilGuruPage() {
           <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <User className="w-5 h-5 text-blue-600" />
-                Informasi Profesional
+                <User className="w-5 h-5 text-slate-800" />
+                Informasi Dasar
               </CardTitle>
-              <CardDescription>Perbarui data diri dan biografi pengajar Anda.</CardDescription>
+              <CardDescription>Perbarui nama dan alamat email administrator Anda.</CardDescription>
             </CardHeader>
             <form onSubmit={handleUpdateProfile}>
               <CardContent className="space-y-6">
@@ -297,40 +280,18 @@ export default function ProfilGuruPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Kerja</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input 
                       id="email" 
                       type="email"
-                      placeholder="email@sekolah.sch.id"
                       value={formData.email} 
                       onChange={e => setFormData({...formData, email: e.target.value})} 
                     />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Mata Pelajaran Utama</Label>
-                  <Input 
-                    id="subject" 
-                    value={formData.subject} 
-                    onChange={e => setFormData({...formData, subject: e.target.value})} 
-                    placeholder="Contoh: IPA Terpadu (Pertanian)"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Biografi Singkat</Label>
-                  <Textarea 
-                    id="bio" 
-                    placeholder="Tuliskan sedikit tentang latar belakang pendidikan atau fokus pengajaran Anda..."
-                    className="min-h-[120px] resize-none"
-                    value={formData.bio}
-                    onChange={e => setFormData({...formData, bio: e.target.value})}
-                  />
-                </div>
               </CardContent>
               <CardFooter className="border-t pt-4">
-                <Button type="submit" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" disabled={isSaving} className="bg-slate-800 hover:bg-slate-900">
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                   Simpan Perubahan
                 </Button>
@@ -341,10 +302,10 @@ export default function ProfilGuruPage() {
           <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-blue-600" />
+                <KeyRound className="w-5 h-5 text-slate-800" />
                 Keamanan Akun
               </CardTitle>
-              <CardDescription>Kelola password untuk menjaga keamanan akses portal Anda.</CardDescription>
+              <CardDescription>Ubah password Anda secara berkala untuk menjaga keamanan akses.</CardDescription>
             </CardHeader>
             <form onSubmit={handleChangePassword}>
               <CardContent className="space-y-4">

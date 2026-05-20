@@ -47,3 +47,72 @@ export async function GET(req) {
     return NextResponse.json({ success: false, error: "Internal Error" }, { status: 500 });
   }
 }
+
+export async function POST(req) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "SISWA") {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    let pilarId, title, description, fileUrls;
+
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      pilarId = body.pilarId;
+      title = body.title;
+      description = body.description;
+      fileUrls = body.fileUrls;
+    } else {
+      const formData = await req.formData();
+      pilarId = formData.get("pilarId");
+      title = formData.get("title");
+      description = formData.get("description");
+      // Fallback lama (jika masih ada yang pakai manual upload)
+      fileUrls = ["https://placehold.co/600x400?text=BVoice+Portfolio"];
+    }
+
+    if (!pilarId || !title || !description) {
+      return NextResponse.json({ success: false, error: "Data tidak lengkap" }, { status: 400 });
+    }
+
+    const newPortfolio = await prisma.bVoicePortfolio.create({
+      data: {
+        studentId: session.user.id,
+        pilarId: parseInt(pilarId),
+        title,
+        description,
+        fileUrls: fileUrls || [],
+        status: "PENDING"
+      }
+    });
+
+    // Create Notification for Guru
+    await prisma.notification.create({
+      data: {
+        type: "BVOICE",
+        title: "Submit B'Voice Baru",
+        message: `${session.user.name} baru saja mengirim portofolio "${title}"`,
+        link: "/guru/validasi",
+        role: "GURU"
+      }
+    });
+
+    // Create Notification for Admin
+    await prisma.notification.create({
+      data: {
+        type: "BVOICE",
+        title: "Submit B'Voice Baru",
+        message: `${session.user.name} (Siswa) mengirim portofolio baru`,
+        link: "/admin/bvoice",
+        role: "ADMIN"
+      }
+    });
+
+    return NextResponse.json({ success: true, data: newPortfolio });
+  } catch (error) {
+    console.error("[BVOICE_POST]", error);
+    return NextResponse.json({ success: false, error: "Internal Error" }, { status: 500 });
+  }
+}

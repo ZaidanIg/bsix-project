@@ -38,16 +38,22 @@ export const authOptions = {
           name: user.name,
           nisNip: user.nisNip,
           role: user.role,
+          image: user.image,
         };
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.nisNip = user.nisNip;
+        token.image = user.image;
+      }
+      // Handle session update
+      if (trigger === "update" && session?.image) {
+        token.image = session.image;
       }
       return token;
     },
@@ -56,6 +62,7 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.nisNip = token.nisNip;
+        session.user.image = token.image;
       }
       return session;
     }

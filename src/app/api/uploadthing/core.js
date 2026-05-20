@@ -19,4 +19,13 @@ export const ourFileRouter = {
       console.log("Document upload complete:", file.url);
       return { url: file.url };
     }),
+
+  mediaUploader: f({ 
+    image: { maxFileSize: "4MB", maxFileCount: 4 },
+    video: { maxFileSize: "16MB", maxFileCount: 1 } 
+  })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Media upload complete:", file.url);
+      return { url: file.url };
+    }),
 };

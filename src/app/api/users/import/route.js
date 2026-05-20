@@ -23,16 +23,31 @@ export async function POST(req) {
     for (const u of users) {
       try {
         const hashedPassword = await bcrypt.hash(u.password, 10);
-        const newUser = await prisma.user.create({
-          data: {
-            nisNip: u.nisNip,
-            name: u.name,
-            email: u.email || null,
-            password: hashedPassword,
-            role: "SISWA", // import via csv ini fokus siswa dulu
+        
+        await prisma.$transaction(async (tx) => {
+          const newUser = await tx.user.create({
+            data: {
+              nisNip: u.nisNip,
+              name: u.name,
+              email: u.email || null,
+              password: hashedPassword,
+              role: u.role || "SISWA",
+            }
+          });
+
+          if (u.role === "GURU") {
+            await tx.teacher.create({
+              data: {
+                userId: newUser.id,
+                nip: u.nisNip,
+                subject: u.subject || "Umum",
+                bio: u.bio || null,
+              }
+            });
           }
+
+          createdUsers.push(newUser);
         });
-        createdUsers.push(newUser);
       } catch (err) {
         errors.push(`Gagal untuk NIS/NIP: ${u.nisNip} - ${err.message}`);
       }

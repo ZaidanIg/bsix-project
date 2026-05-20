@@ -8,7 +8,7 @@ import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function BerandaPublic() {
-  const [totalSiswa, totalGuru, pilarTeratas, beritaTerbaru] = await Promise.all([
+  const [totalSiswa, totalGuru, pilarTeratas, beritaTerbaru, facility] = await Promise.all([
     prisma.user.count({ where: { role: "SISWA", isActive: true } }),
     prisma.teacher.count({ where: { isActive: true } }),
     prisma.pilarBSix.findMany({ take: 3 }),
@@ -17,7 +17,8 @@ export default async function BerandaPublic() {
       orderBy: { publishedAt: "desc" }, 
       take: 3,
       select: { id: true, title: true, slug: true, thumbnailUrl: true, publishedAt: true }
-    })
+    }),
+    prisma.facility.findMany({ where: { isActive: true }, take: 3 })
   ]);
 
   return (
@@ -35,10 +36,10 @@ export default async function BerandaPublic() {
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl space-y-8">
           <Badge text="Pendaftaran SPMB Telah Dibuka" />
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
-            Mendidik Generasi Muda Menjadi <span className="text-green-400">Petani Modern</span> Berkarakter.
+            Sekolah Nyaman, Anak Berkarakter, <span className="text-green-400">Siap Masa Depan.</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            SMP Bina Harapan Jatigede hadir sebagai solusi pendidikan adaptif bagi Generasi Muda OTD melalui program unggulan B'Six.
+            Tempat anak belajar dengan tenang, dibimbing dengann perhatian, dan tumbuh menjadi pribadi mandiri serta berakhlak baik.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/spmb">
@@ -110,6 +111,31 @@ export default async function BerandaPublic() {
             <Link href="/program-bsix">
               <Button variant="outline" className="font-semibold">Lihat Semua Pilar B'Six</Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* B'SIX PREVIEW FACILITY */}
+      <section className="py-24 bg-slate-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Fasilitas B'Six</h2>
+            <p className="text-slate-600">
+              Fasilitas modern yang mendukung pembelajaran dan pengembangan karakter generasi masa depan.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {facility.map(f => (
+              <div key={f.id} className="bg-white rounded-2xl p-8 shadow-sm border hover:shadow-md transition-shadow">
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-6 bg-green-100 text-green-600"
+                >
+                  <Sprout className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{f.name}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed line-clamp-4">{f.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

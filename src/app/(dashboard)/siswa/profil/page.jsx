@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { 
   User, 
   Mail, 
@@ -23,11 +24,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { UploadButton } from "@/lib/uploadthing";
+import { 
+  Avatar, 
+  AvatarImage, 
+  AvatarFallback 
+} from "@/components/ui/avatar";
 
 export default function ProfilSiswaPage() {
+  const { data: session, update } = useSession();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -62,6 +71,27 @@ export default function ProfilSiswaPage() {
     }
   };
 
+  const handleImageUpload = async (url) => {
+    try {
+      const res = await fetch("/api/users/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: url })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        toast.success("Foto profil diperbarui");
+        setProfile(prev => ({ ...prev, image: url }));
+        await update({ image: url });
+      } else {
+        toast.error(result.error);
+      }
+    } catch (err) {
+      toast.error("Gagal memperbarui foto profil");
+    }
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -80,6 +110,7 @@ export default function ProfilSiswaPage() {
       if (result.success) {
         toast.success("Profil berhasil diperbarui");
         setProfile(result.data);
+        await update({ name: formData.name });
       } else {
         toast.error(result.error);
       }
@@ -134,6 +165,13 @@ export default function ProfilSiswaPage() {
     );
   }
 
+  const initials = profile?.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase() || "U";
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
@@ -146,9 +184,48 @@ export default function ProfilSiswaPage() {
         <div className="md:col-span-1 space-y-6">
           <Card className="text-center overflow-hidden border-none shadow-sm">
             <div className="h-20 bg-primary/10" />
-            <CardContent className="-mt-10 pb-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white border-4 border-white shadow-md mb-3">
-                <User className="w-10 h-10 text-primary" />
+            <CardContent className="-mt-10 pb-6 flex flex-col items-center">
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <Avatar className="w-28 h-28 border-4 border-white shadow-xl relative overflow-hidden">
+                    <AvatarImage src={profile?.image} alt={profile?.name} className="object-cover" />
+                    <AvatarFallback className="bg-blue-100 text-blue-700 text-3xl font-bold">
+                      {initials}
+                    </AvatarFallback>
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                        <Loader2 className="w-8 h-8 text-white animate-spin" />
+                      </div>
+                    )}
+                  </Avatar>
+                </div>
+                <div className="mt-4 flex flex-col items-center">
+                  <UploadButton
+                    endpoint="imageUploader"
+                    onUploadBegin={() => setIsUploading(true)}
+                    onClientUploadComplete={(res) => {
+                      setIsUploading(false);
+                      if (res?.[0]) {
+                        handleImageUpload(res[0].url);
+                      }
+                    }}
+                    onUploadError={(error) => {
+                      setIsUploading(false);
+                      toast.error(`Gagal upload: ${error.message}. Pastikan UPLOADTHING_TOKEN sudah diatur.`);
+                    }}
+                    appearance={{
+                      button: `bg-blue-600 hover:bg-blue-700 text-white rounded-full text-[10px] h-8 px-4 transition-all shadow-sm font-bold uppercase tracking-wider ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`,
+                      allowedContent: "hidden",
+                    }}
+                    content={{
+                      button({ ready }) {
+                        if (isUploading) return "Mengunggah...";
+                        if (ready) return "Ubah Foto";
+                        return "Menyiapkan...";
+                      },
+                    }}
+                  />
+                </div>
               </div>
               <h2 className="text-xl font-bold text-slate-900">{profile?.name}</h2>
               <p className="text-xs font-semibold text-primary uppercase tracking-widest mt-1">Siswa</p>
@@ -173,7 +250,7 @@ export default function ProfilSiswaPage() {
           </Card>
         </div>
 
-        {/* Form Settings */}
+        {/* Form Profil */}
         <div className="md:col-span-2 space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader>

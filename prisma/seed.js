@@ -6,7 +6,10 @@ const bcrypt = require('bcryptjs')
 // Bypassing self-signed certificate issues
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+})
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
@@ -41,7 +44,7 @@ async function main() {
   })
 
   // 3. Seed akun Siswa default
-  const studentPassword = await bcrypt.hash('Siswa@BMSF2025', 10)
+  const studentPassword = await bcrypt.hash('c', 10)
   await prisma.user.upsert({
     where: { nisNip: '21221001' },
     update: {},

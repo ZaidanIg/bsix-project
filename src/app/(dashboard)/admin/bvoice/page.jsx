@@ -40,12 +40,28 @@ import {
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import toast from "react-hot-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { useRouter } from "next/navigation";
 
 export default function AdminBVoicePage() {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -74,9 +90,8 @@ export default function AdminBVoicePage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = async (id) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus portofolio ini? Tindakan ini tidak dapat dibatalkan.")) return;
-    
+  const handleDelete = async () => {
+    const id = itemToDelete.id;
     try {
       const res = await fetch(`/api/bvoice/${id}`, { method: "DELETE" });
       const result = await res.json();
@@ -88,6 +103,8 @@ export default function AdminBVoicePage() {
       }
     } catch (err) {
       toast.error("Terjadi kesalahan saat menghapus");
+    } finally {
+      setIsDeleteOpen(false);
     }
   };
 
@@ -205,24 +222,27 @@ export default function AdminBVoicePage() {
                       {getStatusBadge(item.status)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger render={
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        } />
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2">
-                            <Eye className="w-4 h-4" /> Lihat Detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="gap-2 text-red-600 focus:text-red-600"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4" /> Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 gap-1.5 font-bold"
+                          onClick={() => router.push(`/admin/bvoice/${item.id}`)}
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Detail
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 font-bold"
+                          onClick={() => {
+                            setItemToDelete(item);
+                            setIsDeleteOpen(true);
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Hapus
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -237,6 +257,24 @@ export default function AdminBVoicePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Portofolio B'Voice?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus portofolio <strong>{itemToDelete?.title}</strong> oleh <strong>{itemToDelete?.student.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Ya, Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

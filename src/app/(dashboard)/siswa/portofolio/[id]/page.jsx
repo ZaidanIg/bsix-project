@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
@@ -31,11 +31,7 @@ export default function DetailPortofolioSiswa() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDetail();
-  }, [params.id]);
-
-  const fetchDetail = async () => {
+  const fetchDetail = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch(`/api/bvoice/${params.id}`);
@@ -51,7 +47,11 @@ export default function DetailPortofolioSiswa() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id, router]);
+
+  useEffect(() => {
+    fetchDetail();
+  }, [fetchDetail]);
 
   if (isLoading) {
     return <div className="p-8 text-center text-slate-500">Memuat detail portofolio...</div>;
@@ -131,22 +131,24 @@ export default function DetailPortofolioSiswa() {
               </CardTitle>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {data.fileUrls.map((url, i) => (
-                  <a 
+                  <div 
                     key={i} 
-                    href={url} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="group relative aspect-square rounded-lg overflow-hidden border bg-slate-50 hover:border-primary transition-colors"
+                    className="group relative aspect-square rounded-lg overflow-hidden border bg-slate-50 hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => window.open(url, '_blank')}
                   >
-                    <img 
-                      src={url} 
-                      alt={`Lampiran ${i+1}`} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
-                    />
+                    {url.match(/\.(mp4|webm|mov)$/i) ? (
+                      <video src={url} className="w-full h-full object-cover" />
+                    ) : (
+                      <img 
+                        src={url} 
+                        alt={`Lampiran ${i+1}`} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <ExternalLink className="text-white w-6 h-6" />
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             </div>

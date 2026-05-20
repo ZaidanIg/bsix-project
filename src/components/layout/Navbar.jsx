@@ -17,6 +17,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "Beranda" },
     { href: "/program-bsix", label: "Program B'Six" },
+    { href: "/fasilitas", label: "Fasilitas" },
     { href: "/galeri", label: "Galeri" },
     { href: "/pendidik", label: "Guru" },
     { href: "/berita", label: "Berita" },
