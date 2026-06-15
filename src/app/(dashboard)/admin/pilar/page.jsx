@@ -65,6 +65,7 @@ const ICON_OPTIONS = [
 
 export default function AdminPilarPage() {
   const [pilars, setPilars] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -80,12 +81,26 @@ export default function AdminPilarPage() {
     name: "",
     description: "",
     icon: "Leaf",
-    colorHex: "#16a34a"
+    colorHex: "#16a34a",
+    teacherIds: []
   });
 
   useEffect(() => {
     fetchPilars();
+    fetchTeachers();
   }, []);
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await fetch("/api/users?role=GURU");
+      const result = await res.json();
+      if (result.success) {
+        setTeachers(result.data);
+      }
+    } catch (err) {
+      console.error("Gagal memuat data guru");
+    }
+  };
 
   const fetchPilars = async () => {
     setIsLoading(true);
@@ -110,7 +125,8 @@ export default function AdminPilarPage() {
         name: pilar.name,
         description: pilar.description,
         icon: pilar.icon,
-        colorHex: pilar.colorHex
+        colorHex: pilar.colorHex,
+        teacherIds: pilar.teachers?.map(t => t.id) || []
       });
     } else {
       setSelectedPilar(null);
@@ -119,7 +135,8 @@ export default function AdminPilarPage() {
         name: "",
         description: "",
         icon: "Leaf",
-        colorHex: "#16a34a"
+        colorHex: "#16a34a",
+        teacherIds: []
       });
     }
     setIsDialogOpen(true);
@@ -339,21 +356,53 @@ export default function AdminPilarPage() {
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="color">Warna Pilar</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    id="color" 
-                    type="color" 
-                    value={formData.colorHex} 
-                    onChange={e => setFormData({...formData, colorHex: e.target.value})} 
-                    className="w-12 h-11 p-1"
-                  />
-                  <Input 
-                    value={formData.colorHex} 
-                    onChange={e => setFormData({...formData, colorHex: e.target.value})} 
-                    className="flex-1 font-mono text-sm"
-                  />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="color">Warna Pilar</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      id="color" 
+                      type="color" 
+                      value={formData.colorHex} 
+                      onChange={e => setFormData({...formData, colorHex: e.target.value})} 
+                      className="w-12 h-11 p-1"
+                    />
+                    <Input 
+                      value={formData.colorHex} 
+                      onChange={e => setFormData({...formData, colorHex: e.target.value})} 
+                      className="flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Guru Pengampu (Evaluator)</Label>
+                  <div className="max-h-40 overflow-y-auto border rounded-md p-2 space-y-2">
+                    {teachers.length === 0 ? (
+                      <p className="text-xs text-slate-500 p-2">Tidak ada data guru.</p>
+                    ) : (
+                      teachers.map(teacher => (
+                        <div key={teacher.id} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`teacher-${teacher.id}`}
+                            checked={formData.teacherIds.includes(teacher.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData(prev => ({ ...prev, teacherIds: [...prev.teacherIds, teacher.id] }));
+                              } else {
+                                setFormData(prev => ({ ...prev, teacherIds: prev.teacherIds.filter(id => id !== teacher.id) }));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <label htmlFor={`teacher-${teacher.id}`} className="text-sm cursor-pointer">
+                            {teacher.name}
+                          </label>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -4,7 +4,11 @@ import prisma from "@/lib/prisma";
 import UploadForm from "./UploadForm";
 
 export default async function UploadPage() {
-  const pilars = await prisma.pilarBSix.findMany();
+  const pilars = await prisma.pilarBSix.findMany({
+    include: {
+      teachers: { select: { id: true, name: true } }
+    }
+  });
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

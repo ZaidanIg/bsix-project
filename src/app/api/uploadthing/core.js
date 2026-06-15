@@ -28,4 +28,14 @@ export const ourFileRouter = {
       console.log("Media upload complete:", file.url);
       return { url: file.url };
     }),
+
+  bsixUploader: f({ 
+    image: { maxFileSize: "4MB", maxFileCount: 4 },
+    video: { maxFileSize: "16MB", maxFileCount: 1 },
+    pdf: { maxFileSize: "8MB", maxFileCount: 2 }
+  })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Bsix upload complete:", file.url);
+      return { url: file.url };
+    }),
 };

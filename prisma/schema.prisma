@@ -19,6 +19,8 @@ model User {
   image             String?
   articles          Article[]
   bvoicePortfolios  BVoicePortfolio[]
+  assignedBVoicePortfolios BVoicePortfolio[] @relation("AssignedTeacher")
+  pilars            PilarBSix[]        @relation("PilarTeachers")
   gradesValidations GradesValidation[]
   teacher           Teacher?
 
@@ -46,6 +48,7 @@ model PilarBSix {
   icon        String
   colorHex    String
   portfolios  BVoicePortfolio[]
+  teachers    User[]            @relation("PilarTeachers")
 
   @@map("pilar_bsix")
 }
@@ -56,13 +59,15 @@ model BVoicePortfolio {
   pilarId     Int
   title       String            @db.VarChar(200)
   description String            @db.VarChar(1000)
-  fileUrls    String[]
-  status      SubmissionStatus  @default(PENDING)
-  submittedAt DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  pilar       PilarBSix         @relation(fields: [pilarId], references: [id])
-  student     User              @relation(fields: [studentId], references: [id])
-  validation  GradesValidation?
+  fileUrls        String[]
+  status          SubmissionStatus  @default(PENDING)
+  submittedAt     DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  teacherId       String?
+  pilar           PilarBSix         @relation(fields: [pilarId], references: [id])
+  student         User              @relation(fields: [studentId], references: [id])
+  assignedTeacher User?             @relation("AssignedTeacher", fields: [teacherId], references: [id])
+  validation      GradesValidation?
 
   @@map("bvoice_portfolio")
 }

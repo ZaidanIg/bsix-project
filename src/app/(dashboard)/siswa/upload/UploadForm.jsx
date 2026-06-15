@@ -15,6 +15,7 @@ export default function UploadForm({ pilars }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [pilarId, setPilarId] = useState("");
+  const [teacherId, setTeacherId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]); // Array of { url, name, type }
@@ -26,6 +27,10 @@ export default function UploadForm({ pilars }) {
     if (uploadedFiles.length === 0) {
       return toast.error("Silakan unggah bukti kegiatan terlebih dahulu");
     }
+    
+    if (!teacherId) {
+      return toast.error("Silakan pilih Guru Evaluator");
+    }
 
     setLoading(true);
 
@@ -35,6 +40,7 @@ export default function UploadForm({ pilars }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pilarId,
+          teacherId,
           title,
           description,
           fileUrls: uploadedFiles.map(f => f.url)
@@ -87,6 +93,34 @@ export default function UploadForm({ pilars }) {
             </div>
           </div>
 
+          {pilarId && (
+            <div className="space-y-2">
+              <Label htmlFor="teacherId">Guru Evaluator</Label>
+              <div className="relative">
+                <select
+                  id="teacherId"
+                  required
+                  value={teacherId}
+                  onChange={(e) => setTeacherId(e.target.value)}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                >
+                  <option value="" disabled>Pilih Guru</option>
+                  {pilars.find(p => p.id.toString() === pilarId)?.teachers?.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                  <ChevronDownIcon className="h-4 w-4" />
+                </div>
+              </div>
+              {pilars.find(p => p.id.toString() === pilarId)?.teachers?.length === 0 && (
+                <p className="text-xs text-red-500 mt-1">Belum ada guru yang ditugaskan untuk pilar ini.</p>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="title">Judul Kegiatan</Label>
             <Input 
@@ -111,7 +145,7 @@ export default function UploadForm({ pilars }) {
           </div>
 
           <div className="space-y-3">
-            <Label>Bukti Foto / Video</Label>
+            <Label>Bukti File / Media</Label>
             
             {uploadedFiles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -149,7 +183,7 @@ export default function UploadForm({ pilars }) {
             {uploadedFiles.length < 5 && (
               <div className="mt-2">
                 <UploadDropzone
-                  endpoint="mediaUploader"
+                  endpoint="bsixUploader"
                   onUploadBegin={() => setIsUploading(true)}
                   onClientUploadComplete={(res) => {
                     setIsUploading(false);
@@ -172,8 +206,8 @@ export default function UploadForm({ pilars }) {
                     button: "bg-primary text-white text-xs h-8 px-4 mt-4"
                   }}
                   content={{
-                    label: "Klik atau tarik foto/video ke sini",
-                    allowedContent: "Gambar (4MB) atau Video (16MB)"
+                    label: "Klik atau tarik file ke sini",
+                    allowedContent: "Gambar (4MB), PDF (8MB), atau Video (16MB)"
                   }}
                 />
               </div>

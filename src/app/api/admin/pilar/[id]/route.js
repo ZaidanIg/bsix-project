@@ -12,11 +12,19 @@ export async function PUT(req, { params }) {
 
     const id = parseInt(params.id);
     const body = await req.json();
-    const { code, name, description, icon, colorHex } = body;
+    const { code, name, description, icon, colorHex, teacherIds } = body;
+
+    const updateData = { code, name, description, icon, colorHex };
+    
+    if (teacherIds && Array.isArray(teacherIds)) {
+      updateData.teachers = {
+        set: teacherIds.map(tid => ({ id: tid }))
+      };
+    }
 
     const pilar = await prisma.pilarBSix.update({
       where: { id },
-      data: { code, name, description, icon, colorHex }
+      data: updateData
     });
 
     return NextResponse.json({ success: true, data: pilar });

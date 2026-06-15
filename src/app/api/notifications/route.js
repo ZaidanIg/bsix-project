@@ -20,8 +20,16 @@ export async function GET(req) {
         role: "SISWA",
         targetId: session.user.id
       };
+    } else if (session.user.role === "GURU") {
+      whereClause = {
+        OR: [
+          { role: "GURU", targetId: session.user.id },
+          { role: "GURU", targetId: null },
+          { role: null, targetId: null }
+        ]
+      };
     } else {
-      // Admin/Guru melihat notifikasi berdasarkan role atau global
+      // Admin melihat notifikasi berdasarkan role atau global
       whereClause = {
         OR: [
           { role: session.user.role },
@@ -60,6 +68,14 @@ export async function PATCH(req) {
     let whereClause = {};
     if (session.user.role === "SISWA") {
       whereClause = { role: "SISWA", targetId: session.user.id };
+    } else if (session.user.role === "GURU") {
+      whereClause = {
+        OR: [
+          { role: "GURU", targetId: session.user.id },
+          { role: "GURU", targetId: null },
+          { role: null, targetId: null }
+        ]
+      };
     } else {
       whereClause = {
         OR: [

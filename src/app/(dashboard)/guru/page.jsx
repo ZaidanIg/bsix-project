@@ -11,7 +11,10 @@ export default async function GuruDashboard() {
 
   // Ambil statistik
   const pendingCount = await prisma.bVoicePortfolio.count({
-    where: { status: "PENDING" },
+    where: { 
+      status: "PENDING",
+      teacherId: session.user.id
+    },
   });
 
   const today = new Date();

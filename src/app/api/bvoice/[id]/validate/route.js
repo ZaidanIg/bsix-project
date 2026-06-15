@@ -24,6 +24,10 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: "Portfolio not found or already validated" }, { status: 400 });
     }
 
+    if (portfolio.teacherId && portfolio.teacherId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden: You are not assigned to evaluate this portfolio" }, { status: 403 });
+    }
+
     const status = action === "APPROVE" ? "VALIDATED" : "REJECTED";
 
     // Transaction to update portfolio status and create validation record

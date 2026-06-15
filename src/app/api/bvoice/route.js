@@ -23,7 +23,9 @@ export async function GET(req) {
 
     if (session.user.role === "SISWA") {
       whereClause.studentId = session.user.id;
-    } else if (session.user.role !== "ADMIN" && session.user.role !== "GURU") {
+    } else if (session.user.role === "GURU") {
+      whereClause.teacherId = session.user.id;
+    } else if (session.user.role !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
@@ -55,25 +57,27 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    let pilarId, title, description, fileUrls;
+    let pilarId, teacherId, title, description, fileUrls;
 
     const contentType = req.headers.get("content-type") || "";
     if (contentType.includes("application/json")) {
       const body = await req.json();
       pilarId = body.pilarId;
+      teacherId = body.teacherId;
       title = body.title;
       description = body.description;
       fileUrls = body.fileUrls;
     } else {
       const formData = await req.formData();
       pilarId = formData.get("pilarId");
+      teacherId = formData.get("teacherId");
       title = formData.get("title");
       description = formData.get("description");
       // Fallback lama (jika masih ada yang pakai manual upload)
       fileUrls = ["https://placehold.co/600x400?text=BVoice+Portfolio"];
     }
 
-    if (!pilarId || !title || !description) {
+    if (!pilarId || !title || !description || !teacherId) {
       return NextResponse.json({ success: false, error: "Data tidak lengkap" }, { status: 400 });
     }
 
@@ -81,6 +85,7 @@ export async function POST(req) {
       data: {
         studentId: session.user.id,
         pilarId: parseInt(pilarId),
+        teacherId,
         title,
         description,
         fileUrls: fileUrls || [],
@@ -95,7 +100,8 @@ export async function POST(req) {
         title: "Submit B'Voice Baru",
         message: `${session.user.name} baru saja mengirim portofolio "${title}"`,
         link: "/guru/validasi",
-        role: "GURU"
+        role: "GURU",
+        targetId: teacherId
       }
     });
 

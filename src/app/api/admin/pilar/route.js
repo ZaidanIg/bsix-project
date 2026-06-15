@@ -6,7 +6,10 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const pilars = await prisma.pilarBSix.findMany({
-      orderBy: { id: "asc" }
+      orderBy: { id: "asc" },
+      include: {
+        teachers: { select: { id: true, name: true } }
+      }
     });
     return NextResponse.json({ success: true, data: pilars });
   } catch (error) {
@@ -22,14 +25,25 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { code, name, description, icon, colorHex } = body;
+    const { code, name, description, icon, colorHex, teacherIds } = body;
 
     if (!code || !name || !description || !icon || !colorHex) {
       return NextResponse.json({ success: false, error: "Semua field wajib diisi" }, { status: 400 });
     }
 
     const pilar = await prisma.pilarBSix.create({
-      data: { code, name, description, icon, colorHex }
+      data: { 
+        code, 
+        name, 
+        description, 
+        icon, 
+        colorHex,
+        ...(teacherIds && teacherIds.length > 0 ? {
+          teachers: {
+            connect: teacherIds.map(id => ({ id }))
+          }
+        } : {})
+      }
     });
 
     return NextResponse.json({ success: true, data: pilar });
