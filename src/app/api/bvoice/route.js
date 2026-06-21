@@ -33,7 +33,7 @@ export async function GET(req) {
       where: whereClause,
       include: {
         student: {
-          select: { name: true, nisNip: true },
+          select: { name: true, nisNik: true },
         },
         pilar: true,
         validation: true, // Sertakan info validasi (skor & feedback)

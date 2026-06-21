@@ -21,7 +21,7 @@ export async function GET(req, { params }) {
       },
       include: {
         student: {
-          select: { name: true, nisNip: true },
+          select: { name: true, nisNik: true },
         },
         pilar: true,
         validation: true,

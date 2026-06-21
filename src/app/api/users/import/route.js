@@ -12,7 +12,7 @@ export async function POST(req) {
     if (!session || session.user.role !== "ADMIN") return new NextResponse("Unauthorized", { status: 401 });
 
     const body = await req.json();
-    const { users } = body; // array of { nisNip, name, email, password, role }
+    const { users } = body; // array of { nisNik, name, email, password, role }
 
     if (!Array.isArray(users)) return new NextResponse("Format salah", { status: 400 });
 
@@ -22,12 +22,16 @@ export async function POST(req) {
     // Proses satu per satu untuk menghindari seluruh batch gagal jika ada 1 error
     for (const u of users) {
       try {
+        if (u.role === "GURU" && (!u.nisNik || u.nisNik.length !== 16)) {
+          throw new Error("NIK Guru harus terdiri dari 16 karakter");
+        }
+
         const hashedPassword = await bcrypt.hash(u.password, 10);
         
         await prisma.$transaction(async (tx) => {
           const newUser = await tx.user.create({
             data: {
-              nisNip: u.nisNip,
+              nisNik: u.nisNik,
               name: u.name,
               email: u.email || null,
               password: hashedPassword,
@@ -39,7 +43,7 @@ export async function POST(req) {
             await tx.teacher.create({
               data: {
                 userId: newUser.id,
-                nip: u.nisNip,
+                nik: u.nisNik,
                 subject: u.subject || "Umum",
                 bio: u.bio || null,
               }
@@ -49,7 +53,7 @@ export async function POST(req) {
           createdUsers.push(newUser);
         });
       } catch (err) {
-        errors.push(`Gagal untuk NIS/NIP: ${u.nisNip} - ${err.message}`);
+        errors.push(`Gagal untuk NIS/NIK: ${u.nisNik} - ${err.message}`);
       }
     }
 

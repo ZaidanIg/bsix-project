@@ -7,16 +7,16 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        nisNip: { label: "NIS/NIP", type: "text", placeholder: "NIS atau NIP" },
+        nisNik: { label: "NIS/NIK", type: "text", placeholder: "NIS atau NIK" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.nisNip || !credentials?.password) {
+        if (!credentials?.nisNik || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
 
         const user = await prisma.user.findUnique({
-          where: { nisNip: credentials.nisNip }
+          where: { nisNik: credentials.nisNik }
         });
 
         if (!user) {
@@ -36,7 +36,7 @@ export const authOptions = {
         return {
           id: user.id,
           name: user.name,
-          nisNip: user.nisNip,
+          nisNik: user.nisNik,
           role: user.role,
           image: user.image,
         };
@@ -48,7 +48,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.nisNip = user.nisNip;
+        token.nisNik = user.nisNik;
         token.image = user.image;
       }
       // Handle session update
@@ -61,7 +61,7 @@ export const authOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
-        session.user.nisNip = token.nisNip;
+        session.user.nisNik = token.nisNik;
         session.user.image = token.image;
       }
       return session;

@@ -14,7 +14,7 @@ async function getPortfolio(id) {
   const portfolio = await prisma.bVoicePortfolio.findUnique({
     where: { id },
     include: {
-      student: { select: { name: true, nisNip: true } },
+      student: { select: { name: true, nisNik: true } },
       pilar: true,
       validation: true,
     },
@@ -127,8 +127,8 @@ export default async function ValidasiDetail({ params }) {
                 <p className="font-medium">{portfolio.student.name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">NIS / NIP</p>
-                <p className="font-medium">{portfolio.student.nisNip}</p>
+                <p className="text-sm text-muted-foreground">NIS / NIK</p>
+                <p className="font-medium">{portfolio.student.nisNik}</p>
               </div>
             </CardContent>
           </Card>

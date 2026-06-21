@@ -8,7 +8,7 @@ datasource db {
 
 model User {
   id                String             @id @default(cuid())
-  nisNip            String             @unique
+  nisNik            String             @unique
   name              String
   email             String?            @unique
   password          String
@@ -30,7 +30,7 @@ model User {
 model Teacher {
   id       String  @id @default(cuid())
   userId   String  @unique
-  nip      String  @unique
+  nik      String  @unique
   photo    String?
   subject  String
   bio      String?

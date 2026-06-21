@@ -96,7 +96,7 @@ export default function DetailBVoiceAdmin() {
             <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md">
               <User className="w-4 h-4 text-slate-400" />
               <span className="font-semibold text-slate-700">{data.student.name}</span>
-              <span className="text-slate-400">({data.student.nisNip})</span>
+              <span className="text-slate-400">({data.student.nisNik})</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />

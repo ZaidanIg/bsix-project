@@ -200,7 +200,7 @@ export default function AdminBVoicePage() {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-slate-900">{item.student.name}</div>
-                      <div className="text-xs text-slate-500">{item.student.nisNip}</div>
+                      <div className="text-xs text-slate-500">{item.student.nisNik}</div>
                     </TableCell>
                     <TableCell>
                       <Badge 

@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { AlertCircle, ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
-  nisNip: z.string().min(1, { message: "NIS/NIP tidak boleh kosong" }),
+  nisNik: z.string().min(1, { message: "NIS/NIK tidak boleh kosong" }),
   password: z.string().min(1, { message: "Password tidak boleh kosong" }),
 });
 
@@ -30,7 +30,7 @@ export default function LoginPage() {
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nisNip: "",
+      nisNik: "",
       password: "",
     },
   });
@@ -41,15 +41,21 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
+    if (roleTab === "GURU" && values.nisNik.length !== 16) {
+      setError("NIK Guru harus terdiri dari 16 karakter");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        nisNip: values.nisNip,
+        nisNik: values.nisNik,
         password: values.password,
       });
 
       if (res?.error) {
-        setError(res.error === "CredentialsSignin" ? "NIS/NIP atau Password salah" : res.error);
+        setError(res.error === "CredentialsSignin" ? "NIS/NIK atau Password salah" : res.error);
         setIsLoading(false);
       } else {
         const session = await getSession();
@@ -116,16 +122,16 @@ export default function LoginPage() {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="nisNip">{roleTab === "SISWA" ? "Nomor Induk Siswa (NIS)" : "Nomor Induk Pegawai (NIP)"}</Label>
+              <Label htmlFor="nisNik">{roleTab === "SISWA" ? "Nomor Induk Siswa (NIS)" : "Nomor Induk Kependudukan (NIK)"}</Label>
               <input
-                id="nisNip"
-                placeholder={roleTab === "SISWA" ? "Contoh: 21221001" : "Contoh: 19850101..."}
-                {...register("nisNip")}
-                className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${errors.nisNip ? "border-red-500" : ""}`}
+                id="nisNik"
+                placeholder={roleTab === "SISWA" ? "Contoh: 21221001" : "Contoh: 320101..."}
+                {...register("nisNik")}
+                className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${errors.nisNik ? "border-red-500" : ""}`}
                 disabled={isLoading}
               />
-              {errors.nisNip && (
-                <p className="text-xs text-red-500">{errors.nisNip.message}</p>
+              {errors.nisNik && (
+                <p className="text-xs text-red-500">{errors.nisNik.message}</p>
               )}
             </div>
             

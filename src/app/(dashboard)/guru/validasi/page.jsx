@@ -157,7 +157,7 @@ export default function AntrianValidasi() {
                       </TableCell>
                       <TableCell>
                         <div className="font-semibold text-slate-700">{portfolio.student.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">{portfolio.student.nisNip}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{portfolio.student.nisNik}</div>
                       </TableCell>
                       <TableCell>
                         <Badge 

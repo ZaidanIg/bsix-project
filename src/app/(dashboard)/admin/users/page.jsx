@@ -41,7 +41,7 @@ export default function UserManager() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [role, setRole] = useState("SISWA"); // atau GURU
-  const [formData, setFormData] = useState({ nisNip: "", name: "", email: "", subject: "", bio: "" });
+  const [formData, setFormData] = useState({ nisNik: "", name: "", email: "", subject: "", bio: "" });
   const [generatedPwd, setGeneratedPwd] = useState("");
 
   // States untuk Aksi (Edit, Reset, Toggle)
@@ -167,9 +167,9 @@ export default function UserManager() {
       header: true,
       complete: async (results) => {
         const validUsers = results.data
-          .filter(r => r.nisNip && r.name)
+          .filter(r => r.nisNik && r.name)
           .map(r => ({
-            nisNip: r.nisNip,
+            nisNik: r.nisNik,
             name: r.name,
             email: r.email || null,
             password: generatePassword(),
@@ -225,7 +225,7 @@ export default function UserManager() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>NIS/NIP</TableHead>
+              <TableHead>NIS/NIK</TableHead>
               <TableHead>Nama Lengkap</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
@@ -235,7 +235,7 @@ export default function UserManager() {
           <TableBody>
             {filtered.map(u => (
               <TableRow key={u.id}>
-                <TableCell className="font-medium">{u.nisNip}</TableCell>
+                <TableCell className="font-medium">{u.nisNik}</TableCell>
                 <TableCell>{u.name}</TableCell>
                 <TableCell>{u.email || "-"}</TableCell>
                 <TableCell>
@@ -250,7 +250,7 @@ export default function UserManager() {
                     onClick={() => {
                       setSelectedUser(u);
                       setFormData({ 
-                        nisNip: u.nisNip, 
+                        nisNik: u.nisNik, 
                         name: u.name, 
                         email: u.email || "", 
                         subject: u.teacher?.subject || "", 
@@ -324,7 +324,7 @@ export default function UserManager() {
                   <p className="font-semibold mb-2">Petunjuk Format CSV:</p>
                   <ul className="list-disc list-inside space-y-1 opacity-90">
                     <li>Gunakan baris pertama sebagai header.</li>
-                    <li>Kolom wajib: <strong>nisNip</strong>, <strong>name</strong>.</li>
+                    <li>Kolom wajib: <strong>nisNik</strong>, <strong>name</strong>.</li>
                     <li>Kolom opsional: <strong>email</strong>.</li>
                     {currentTab === "guru" && (
                       <>
@@ -362,7 +362,7 @@ export default function UserManager() {
               </div>
               <DialogFooter>
                 <p className="text-[10px] text-slate-400 text-center w-full italic">
-                  Pastikan data tidak duplikat dengan NIS/NIP yang sudah ada di sistem.
+                  Pastikan data tidak duplikat dengan NIS/NIK yang sudah ada di sistem.
                 </p>
               </DialogFooter>
             </DialogContent>
@@ -372,7 +372,7 @@ export default function UserManager() {
             setIsAddOpen(open);
             if(!open) { 
               setGeneratedPwd(""); 
-              setFormData({ nisNip: "", name: "", email: "", subject: "", bio: "" }); 
+              setFormData({ nisNik: "", name: "", email: "", subject: "", bio: "" }); 
             }
             if(open) { 
               setRole(currentTab.toUpperCase()); 
@@ -396,12 +396,12 @@ export default function UserManager() {
                       <Input value={role} disabled className="bg-slate-50" />
                     </div>
                     <div className="space-y-2">
-                      <Label>{role === "SISWA" ? "NIS" : "NIP"}</Label>
+                      <Label>{role === "SISWA" ? "NIS" : "NIK"}</Label>
                       <Input 
                         required 
-                        placeholder={role === "SISWA" ? "Masukkan NIS" : "Masukkan NIP"}
-                        value={formData.nisNip} 
-                        onChange={e => setFormData({...formData, nisNip: e.target.value})} 
+                        placeholder={role === "SISWA" ? "Masukkan NIS" : "Masukkan NIK"}
+                        value={formData.nisNik} 
+                        onChange={e => setFormData({...formData, nisNik: e.target.value})} 
                       />
                     </div>
                   </div>
@@ -486,8 +486,8 @@ export default function UserManager() {
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label>NIS/NIP</Label>
-              <Input value={formData.nisNip} disabled className="bg-slate-50 cursor-not-allowed" />
+              <Label>NIS/NIK</Label>
+              <Input value={formData.nisNik} disabled className="bg-slate-50 cursor-not-allowed" />
             </div>
             <div className="space-y-2">
               <Label>Nama Lengkap</Label>

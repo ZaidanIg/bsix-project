@@ -58,7 +58,7 @@ export default function RekapSiswaPage() {
 
   const filteredRekap = data?.rekap.filter(student => 
     student.name.toLowerCase().includes(search.toLowerCase()) ||
-    student.nisNip.includes(search)
+    student.nisNik.includes(search)
   ) || [];
 
   const handleExportCSV = () => {
@@ -67,7 +67,7 @@ export default function RekapSiswaPage() {
     const exportData = filteredRekap.map(student => {
       const row = {
         "Nama Siswa": student.name,
-        "NIS": student.nisNip,
+        "NIS": student.nisNik,
       };
       data.pilars.forEach(p => {
         row[p.name] = student.scores[p.code] || "-";
@@ -145,7 +145,7 @@ export default function RekapSiswaPage() {
                   {filteredRekap.map((student) => (
                     <TableRow key={student.id} className="hover:bg-slate-50/50 transition-colors">
                       <TableCell className="font-medium text-slate-900">{student.name}</TableCell>
-                      <TableCell className="text-slate-500 font-mono text-xs">{student.nisNip}</TableCell>
+                      <TableCell className="text-slate-500 font-mono text-xs">{student.nisNik}</TableCell>
                       {data.pilars.map(pilar => {
                         const score = student.scores[pilar.code];
                         return (

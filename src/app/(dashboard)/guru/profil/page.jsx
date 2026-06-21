@@ -247,8 +247,8 @@ export default function ProfilGuruPage() {
                     <ShieldCheck className="w-4 h-4 text-slate-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">NIP (User ID)</p>
-                    <p className="text-sm font-mono font-medium">{profile?.nisNip}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">NIK (User ID)</p>
+                    <p className="text-sm font-mono font-medium">{profile?.nisNik}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

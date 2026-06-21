@@ -32,10 +32,10 @@ async function main() {
   // 2. Seed akun admin default
   const adminPassword = await bcrypt.hash('Admin@BMSF2025', 10)
   await prisma.user.upsert({
-    where: { nisNip: 'ADMIN001' },
+    where: { nisNik: 'ADMIN001' },
     update: {},
     create: { 
-      nisNip: 'ADMIN001', 
+      nisNik: 'ADMIN001', 
       name: 'Administrator', 
       email: 'admin@smpbinaharapan.sch.id', 
       password: adminPassword, 
@@ -46,10 +46,10 @@ async function main() {
   // 3. Seed akun Siswa default
   const studentPassword = await bcrypt.hash('c', 10)
   await prisma.user.upsert({
-    where: { nisNip: '21221001' },
+    where: { nisNik: '21221001' },
     update: {},
     create: {
-      nisNip: '21221001',
+      nisNik: '21221001',
       name: 'Budi Siswanto',
       email: 'budi@student.com',
       password: studentPassword,
@@ -60,10 +60,10 @@ async function main() {
   // 4. Seed akun Guru default
   const teacherPassword = await bcrypt.hash('Guru@BMSF2025', 10)
   const teacherUser = await prisma.user.upsert({
-    where: { nisNip: '19850101001' },
+    where: { nisNik: '3201010101850001' },
     update: {},
     create: {
-      nisNip: '19850101001',
+      nisNik: '3201010101850001',
       name: 'Ibu Pertiwi, S.Pd',
       email: 'pertiwi@teacher.com',
       password: teacherPassword,
@@ -73,11 +73,11 @@ async function main() {
 
   // Pastikan data Teacher juga ada
   await prisma.teacher.upsert({
-    where: { nip: '19850101001' },
+    where: { nik: '3201010101850001' },
     update: {},
     create: {
       userId: teacherUser.id,
-      nip: '19850101001',
+      nik: '3201010101850001',
       subject: 'Ilmu Pengetahuan Alam (Pertanian)',
       bio: 'Pendidik yang berfokus pada pengembangan agrikultur modern di lingkungan sekolah.'
     }
@@ -86,7 +86,7 @@ async function main() {
   console.log('Seed completed successfully!')
   console.log('Default Accounts:')
   console.log('- ADMIN: ADMIN001 / Admin@BMSF2025')
-  console.log('- GURU:  19850101001 / Guru@BMSF2025')
+  console.log('- GURU:  3201010101850001 / Guru@BMSF2025')
   console.log('- SISWA: 21221001 / Siswa@BMSF2025')
 }
 

@@ -235,7 +235,7 @@ export default function ProfilSiswaPage() {
                   <ShieldCheck className="w-4 h-4 text-slate-400" />
                   <div className="text-sm">
                     <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">NIS (User ID)</p>
-                    <p className="font-mono">{profile?.nisNip}</p>
+                    <p className="font-mono">{profile?.nisNik}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-slate-600">

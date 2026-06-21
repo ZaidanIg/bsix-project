@@ -24,7 +24,7 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        nisNip: true,
+        nisNik: true,
         bvoicePortfolios: {
           include: {
             pilar: true,
@@ -61,7 +61,7 @@ export async function GET() {
       return {
         id: student.id,
         name: student.name,
-        nisNip: student.nisNip,
+        nisNik: student.nisNik,
         scores: pilarScores
       };
     });

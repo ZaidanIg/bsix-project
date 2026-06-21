@@ -35,18 +35,22 @@ export async function POST(req) {
     if (!session || session.user.role !== "ADMIN") return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { nisNip, name, email, password, role, subject, bio, class: className } = body;
+    const { nisNik, name, email, password, role, subject, bio, class: className } = body;
 
-    // Cek apakah nisNip sudah ada
-    const existing = await prisma.user.findUnique({ where: { nisNip } });
-    if (existing) return NextResponse.json({ success: false, error: "NIS/NIP sudah terdaftar" }, { status: 400 });
+    // Cek apakah nisNik sudah ada
+    const existing = await prisma.user.findUnique({ where: { nisNik } });
+    if (existing) return NextResponse.json({ success: false, error: "NIS/NIK sudah terdaftar" }, { status: 400 });
+
+    if (role === "GURU" && nisNik.length !== 16) {
+      return NextResponse.json({ success: false, error: "NIK Guru harus terdiri dari 16 karakter" }, { status: 400 });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
-          nisNip,
+          nisNik,
           name,
           email: email || null,
           password: hashedPassword,
@@ -58,7 +62,7 @@ export async function POST(req) {
         await tx.teacher.create({
           data: {
             userId: newUser.id,
-            nip: nisNip,
+            nik: nisNik,
             subject: subject || "Umum",
             bio: bio || null,
           },

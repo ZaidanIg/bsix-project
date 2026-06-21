@@ -23,7 +23,7 @@ export default async function RiwayatValidasi({ searchParams }) {
     include: {
       portfolio: {
         include: {
-          student: { select: { name: true, nisNip: true } },
+          student: { select: { name: true, nisNik: true } },
           pilar: true,
         }
       }
