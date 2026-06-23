@@ -90,19 +90,22 @@ model SpmbRegistration {
   id                 String     @id @default(cuid())
   registrationNumber String     @unique @default(cuid())
   fullName           String
+  nisn               String?
   nik                String
   birthDate          DateTime
   birthPlace         String
   gender             String
   religion           String
   address            String
+  tempatTinggal      String?
+  transportasi       String?
   previousSchool     String
-  graduationYear     Int
-  avgScore           Float
+  graduationYear     Int?
+  avgScore           Float?
   parentName         String
   parentPhone        String
   parentEmail        String?
-  documentUrls       String[]
+  documents          Json?
   status             SPMBStatus @default(PENDING)
   adminNote          String?
   registeredAt       DateTime   @default(now())
@@ -205,4 +208,13 @@ enum NotificationType {
   FEEDBACK
   BVOICE
   SPMB
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
 }

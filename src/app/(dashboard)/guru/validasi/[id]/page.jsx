@@ -71,16 +71,35 @@ export default async function ValidasiDetail({ params }) {
                 <div className="space-y-3">
                   <h3 className="font-semibold text-sm text-slate-900 border-b pb-2">Bukti Kegiatan (Media)</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {portfolio.fileUrls.map((url, i) => (
-                      <div key={i} className="relative aspect-video bg-slate-100 rounded-md overflow-hidden border">
-                        {/* Jika video, gunakan tag video, untuk demo gunakan img */}
-                        {url.match(/\.(mp4|webm)$/i) ? (
+                    {portfolio.fileUrls.map((url, i) => {
+                      const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+                      const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                      
+                      return (
+                      <div key={i} className="relative aspect-video bg-slate-100 rounded-md overflow-hidden border group">
+                        {isVideo ? (
                           <video src={url} controls className="w-full h-full object-cover" />
+                        ) : isImage ? (
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                            <img src={url} alt={`Lampiran ${i+1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-white font-medium flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                Lihat / Unduh
+                              </span>
+                            </div>
+                          </a>
                         ) : (
-                          <img src={url} alt={`Lampiran ${i+1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center w-full h-full bg-slate-50 hover:bg-slate-200 transition-colors p-4 text-center">
+                            <div className="bg-white p-4 rounded-full shadow-sm mb-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            <span className="text-sm font-semibold text-slate-800 underline">Lihat / Unduh Dokumen</span>
+                            <span className="text-xs text-slate-500 mt-1">Format: PDF/Doc</span>
+                          </a>
                         )}
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </div>
               )}

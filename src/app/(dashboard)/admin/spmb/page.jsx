@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, X, Eye, Trash2, Edit, ArrowLeft, Search, Users, Clock, CheckCircle, XCircle, Save, FileText, ExternalLink } from "lucide-react";
+import { Check, X, Eye, Trash2, Edit, ArrowLeft, Search, Users, Clock, CheckCircle, XCircle, Save, FileText, ExternalLink, Download, FileDown, Power } from "lucide-react";
 import toast from "react-hot-toast";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,9 +59,79 @@ export default function AdminSPMBPage() {
     }
   }, []);
 
+  const [isOpen, setIsOpen] = useState(true);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/settings");
+      const json = await res.json();
+      if (json.success && json.data.SPMB_IS_OPEN) {
+        setIsOpen(json.data.SPMB_IS_OPEN !== "false");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleToggleOpen = async () => {
+    const newValue = isOpen ? "false" : "true";
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "SPMB_IS_OPEN", value: newValue })
+      });
+      if(res.ok) {
+        setIsOpen(!isOpen);
+        toast.success(`Pendaftaran SPMB berhasil ${isOpen ? "ditutup" : "dibuka"}`);
+      }
+    } catch(e) {
+      toast.error("Gagal mengubah pengaturan");
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF("landscape");
+    doc.text("Data Pendaftaran SPMB", 14, 15);
+    const tableData = registrations.map((r, i) => [
+      i + 1,
+      r.registrationNumber || r.id,
+      r.fullName,
+      r.nik,
+      r.nisn || "-",
+      r.previousSchool,
+      r.avgScore || "-",
+      r.status === "ACCEPTED" ? "Diterima" : r.status === "REJECTED" ? "Ditolak" : "Pending"
+    ]);
+    doc.autoTable({
+      head: [["No", "ID", "Nama Lengkap", "NIK", "NISN", "Asal Sekolah", "Nilai Rata-rata", "Status"]],
+      body: tableData,
+      startY: 20,
+    });
+    doc.save("Data_SPMB.pdf");
+    toast.success("PDF berhasil diunduh");
+  };
+
+  const handleDownloadCSV = () => {
+    const headers = ["ID,Nama Lengkap,NIK,NISN,Tanggal Lahir,Asal Sekolah,Nilai Rata-rata,Nama Orang Tua,Status\n"];
+    const rows = registrations.map(r => {
+      return `${r.registrationNumber || r.id},"${r.fullName}","${r.nik}","${r.nisn || ""}","${r.birthDate ? r.birthDate.split("T")[0] : ""}","${r.previousSchool}",${r.avgScore || ""},"${r.parentName}","${r.status}"`;
+    });
+    const csvContent = "data:text/csv;charset=utf-8," + headers.concat(rows).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Data_Siswa_SPMB.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV berhasil diunduh");
+  };
+
   useEffect(() => {
     fetchRegistrations();
-  }, [fetchRegistrations]);
+    fetchSettings();
+  }, [fetchRegistrations, fetchSettings]);
 
   // Filter and search
   const filteredData = registrations.filter((reg) => {
@@ -129,13 +201,21 @@ export default function AdminSPMBPage() {
     setSelectedReg(reg);
     setEditData({
       fullName: reg.fullName || "",
+      nik: reg.nik || "",
+      nisn: reg.nisn || "",
       birthPlace: reg.birthPlace || "",
       birthDate: reg.birthDate ? new Date(reg.birthDate).toISOString().split("T")[0] : "",
       gender: reg.gender || "",
+      religion: reg.religion || "",
       address: reg.address || "",
+      tempatTinggal: reg.tempatTinggal || "",
+      transportasi: reg.transportasi || "",
       previousSchool: reg.previousSchool || "",
+      graduationYear: reg.graduationYear || "",
+      avgScore: reg.avgScore || "",
       parentName: reg.parentName || "",
       parentPhone: reg.parentPhone || "",
+      parentEmail: reg.parentEmail || "",
       status: reg.status || "PENDING",
       adminNote: reg.adminNote || "",
     });
@@ -229,11 +309,18 @@ export default function AdminSPMBPage() {
           <CardContent>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
               <InfoRow label="Nama Lengkap" value={selectedReg.fullName} />
+              <InfoRow label="NIK" value={selectedReg.nik} />
+              <InfoRow label="NISN" value={selectedReg.nisn} />
+              <InfoRow label="Agama" value={selectedReg.religion} />
               <InfoRow label="Tempat Lahir" value={selectedReg.birthPlace} />
               <InfoRow label="Tanggal Lahir" value={selectedReg.birthDate ? new Date(selectedReg.birthDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-"} />
               <InfoRow label="Jenis Kelamin" value={selectedReg.gender} />
               <InfoRow label="Alamat" value={selectedReg.address} className="sm:col-span-2" />
+              <InfoRow label="Tempat Tinggal" value={selectedReg.tempatTinggal} />
+              <InfoRow label="Transportasi" value={selectedReg.transportasi} />
               <InfoRow label="Asal Sekolah" value={selectedReg.previousSchool} />
+              <InfoRow label="Tahun Lulus" value={selectedReg.graduationYear} />
+              <InfoRow label="Nilai Rata-rata" value={selectedReg.avgScore} />
               <InfoRow label="Tanggal Daftar" value={selectedReg.registeredAt ? new Date(selectedReg.registeredAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"} />
             </div>
           </CardContent>
@@ -246,6 +333,7 @@ export default function AdminSPMBPage() {
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
               <InfoRow label="Nama Orang Tua" value={selectedReg.parentName} />
               <InfoRow label="No. HP Orang Tua" value={selectedReg.parentPhone} />
+              <InfoRow label="Email Orang Tua" value={selectedReg.parentEmail} className="sm:col-span-2" />
             </div>
           </CardContent>
         </Card>
@@ -301,6 +389,14 @@ export default function AdminSPMBPage() {
                 <Input value={editData.fullName} onChange={(e) => setEditData({ ...editData, fullName: e.target.value })} />
               </div>
               <div className="space-y-2">
+                <Label>NIK</Label>
+                <Input value={editData.nik} onChange={(e) => setEditData({ ...editData, nik: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>NISN</Label>
+                <Input value={editData.nisn} onChange={(e) => setEditData({ ...editData, nisn: e.target.value })} />
+              </div>
+              <div className="space-y-2">
                 <Label>Tempat Lahir</Label>
                 <Input value={editData.birthPlace} onChange={(e) => setEditData({ ...editData, birthPlace: e.target.value })} />
               </div>
@@ -323,9 +419,19 @@ export default function AdminSPMBPage() {
               <Label>Alamat Lengkap</Label>
               <Textarea value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} rows={3} />
             </div>
-            <div className="space-y-2">
-              <Label>Asal Sekolah</Label>
-              <Input value={editData.previousSchool} onChange={(e) => setEditData({ ...editData, previousSchool: e.target.value })} />
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Asal Sekolah</Label>
+                <Input value={editData.previousSchool} onChange={(e) => setEditData({ ...editData, previousSchool: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Tahun Lulus</Label>
+                <Input type="number" value={editData.graduationYear} onChange={(e) => setEditData({ ...editData, graduationYear: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Nilai Rata-rata</Label>
+                <Input type="number" step="0.01" value={editData.avgScore} onChange={(e) => setEditData({ ...editData, avgScore: e.target.value })} />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -341,6 +447,10 @@ export default function AdminSPMBPage() {
               <div className="space-y-2">
                 <Label>No. HP Orang Tua</Label>
                 <Input value={editData.parentPhone} onChange={(e) => setEditData({ ...editData, parentPhone: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Email Orang Tua</Label>
+                <Input type="email" value={editData.parentEmail} onChange={(e) => setEditData({ ...editData, parentEmail: e.target.value })} />
               </div>
             </div>
           </CardContent>
@@ -378,9 +488,25 @@ export default function AdminSPMBPage() {
   // --- LIST VIEW ---
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Manajemen SPMB</h1>
-        <p className="text-slate-500">Kelola seluruh pendaftaran siswa baru.</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Manajemen SPMB</h1>
+          <p className="text-slate-500">Kelola seluruh pendaftaran siswa baru.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={handleToggleOpen} variant={isOpen ? "destructive" : "default"} className={!isOpen ? "bg-green-600 hover:bg-green-700" : ""}>
+            <Power className="w-4 h-4 mr-2" />
+            {isOpen ? "Tutup Pendaftaran" : "Buka Pendaftaran"}
+          </Button>
+          <Button onClick={handleDownloadPDF} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+            <FileDown className="w-4 h-4 mr-2" />
+            Tarik Data (PDF)
+          </Button>
+          <Button onClick={handleDownloadCSV} className="bg-primary text-white">
+            <Download className="w-4 h-4 mr-2" />
+            Download Data Siswa (CSV)
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

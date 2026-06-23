@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toast from "react-hot-toast";
 import { FileUp, ArrowRight, ArrowLeft, CheckCircle, FileText, X } from "lucide-react";
-import { UploadButton } from "@/lib/uploadthing";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -181,14 +181,28 @@ export default function RegisterForm() {
                 <Label htmlFor="parentPhone">No. HP Orang Tua / Wali</Label>
                 <Input id="parentPhone" name="parentPhone" required={step===1} placeholder="08123456789" />
               </div>
-            <div className="space-y-2">
-              <Label htmlFor="previousSchool">Asal Sekolah</Label>
-              <Input id="previousSchool" name="previousSchool" required={step===1} placeholder="SDN 1 Jatigede" />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="previousSchool">Asal Sekolah</Label>
+                <Input id="previousSchool" name="previousSchool" required={step===1} placeholder="SDN 1 Jatigede" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="graduationYear">Tahun Lulus</Label>
+                <Input id="graduationYear" name="graduationYear" type="number" placeholder="2024" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="avgScore">Nilai Rata-rata Ujian/Rapor</Label>
+                <Input id="avgScore" name="avgScore" type="number" step="0.01" placeholder="85.5" />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="parentName">Nama Orang Tua / Wali</Label>
                 <Input id="parentName" name="parentName" required={step===1} placeholder="Budi Santoso" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="parentEmail">Email Orang Tua (Opsional)</Label>
+                <Input id="parentEmail" name="parentEmail" type="email" placeholder="budi@example.com" />
               </div>
             </div>
           </div>
@@ -207,10 +221,11 @@ export default function RegisterForm() {
                     <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, kkUrl: ""})}><X className="h-3 w-3" /></Button>
                   </div>
                 ) : (
-                  <UploadButton
+                  <UploadDropzone
                     endpoint="documentUploader"
                     onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, kkUrl: res[0].url})}
                     onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                    className="ut-label:text-primary ut-button:bg-primary ut-button:ut-readying:bg-primary/50 cursor-pointer border-dashed border-2 border-slate-300 rounded-lg"
                   />
                 )}
               </div>
@@ -224,10 +239,11 @@ export default function RegisterForm() {
                     <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, aktaUrl: ""})}><X className="h-3 w-3" /></Button>
                   </div>
                 ) : (
-                  <UploadButton
+                  <UploadDropzone
                     endpoint="documentUploader"
                     onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, aktaUrl: res[0].url})}
                     onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                    className="ut-label:text-primary ut-button:bg-primary ut-button:ut-readying:bg-primary/50 cursor-pointer border-dashed border-2 border-slate-300 rounded-lg"
                   />
                 )}
               </div>
@@ -241,10 +257,11 @@ export default function RegisterForm() {
                     <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFiles({...uploadedFiles, ijazahUrl: ""})}><X className="h-3 w-3" /></Button>
                   </div>
                 ) : (
-                  <UploadButton
+                  <UploadDropzone
                     endpoint="documentUploader"
                     onClientUploadComplete={(res) => setUploadedFiles({...uploadedFiles, ijazahUrl: res[0].url})}
                     onUploadError={(e) => toast.error(`Gagal: ${e.message}`)}
+                    className="ut-label:text-primary ut-button:bg-primary ut-button:ut-readying:bg-primary/50 cursor-pointer border-dashed border-2 border-slate-300 rounded-lg"
                   />
                 )}
               </div>

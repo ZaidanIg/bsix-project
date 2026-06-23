@@ -32,24 +32,40 @@ export async function POST(req) {
     const { 
       fullName, birthDate, birthPlace, gender, 
       address, previousSchool, parentName, parentPhone,
+      nisn, nik, agama, tempatTinggal, transportasi, 
+      graduationYear, avgScore, parentEmail,
       documents 
     } = body;
 
-    if (!fullName || !birthDate || !address) {
-      return NextResponse.json({ success: false, error: "Data wajib (Nama, Tanggal Lahir, Alamat) tidak boleh kosong" }, { status: 400 });
+    // Check if SPMB is open
+    const spmbSetting = await prisma.systemSetting.findUnique({ where: { key: "SPMB_IS_OPEN" } });
+    if (spmbSetting && spmbSetting.value === "false") {
+      return NextResponse.json({ success: false, error: "Maaf, pendaftaran SPMB saat ini sedang ditutup." }, { status: 403 });
+    }
+
+    if (!fullName || !birthDate || !address || !nik) {
+      return NextResponse.json({ success: false, error: "Data wajib (Nama, NIK, Tanggal Lahir, Alamat) tidak boleh kosong" }, { status: 400 });
     }
 
     const spmb = await prisma.spmbRegistration.create({
       data: {
         fullName,
+        nisn,
+        nik,
         birthDate: new Date(birthDate),
         birthPlace,
         gender,
+        religion: agama || "-",
         address,
+        tempatTinggal,
+        transportasi,
         previousSchool,
+        graduationYear: graduationYear ? parseInt(graduationYear) : null,
+        avgScore: avgScore ? parseFloat(avgScore) : null,
         parentName,
         parentPhone,
-        documents, // Sudah berupa JSON { kk: url, akta: url, ijazah: url }
+        parentEmail,
+        documents, // JSON { kk: url, akta: url, ijazah: url }
       },
     });
 
